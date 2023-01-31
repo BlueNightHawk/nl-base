@@ -7,7 +7,7 @@
 #include "backends/imgui_impl_opengl2.h"
 #include "backends/imgui_impl_sdl.h"
 
-SDL_Window *window;
+SDL_Window* window = nullptr;
 
 int ProcessEvent(void* userdata, SDL_Event* event)
 {
@@ -17,11 +17,20 @@ int ProcessEvent(void* userdata, SDL_Event* event)
 void InitImgui()
 {
     int i = 0;
-    while(!window)
+	SDL_Window* pNextWindow = nullptr;
+	while (!pNextWindow)
     {  
-	    window = SDL_GetWindowFromID(i);
+	    pNextWindow = SDL_GetWindowFromID(i);
+
+		if (!pNextWindow)
+			break;
+
+		window = pNextWindow;
         i++;   
     }
+
+	assert(window != nullptr);
+
 	// Setup Dear ImGui context
 	IMGUI_CHECKVERSION();
 	ImGui::CreateContext();
