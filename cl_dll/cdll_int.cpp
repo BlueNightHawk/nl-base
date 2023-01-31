@@ -36,6 +36,8 @@
 #include "vgui_TeamFortressViewport.h"
 #include "filesystem_utils.h"
 
+#include "nlfuncs.h"
+
 cl_enginefunc_t gEngfuncs;
 CHud gHUD;
 TeamFortressViewport* gViewPort = NULL;
@@ -108,8 +110,6 @@ void DLLEXPORT HUD_PlayerMove(struct playermove_s* ppmove, int server)
 	PM_Move(ppmove, server);
 }
 
-void HookSdl();
-
 int DLLEXPORT Initialize(cl_enginefunc_t* pEnginefuncs, int iVersion)
 {
 	gEngfuncs = *pEnginefuncs;
@@ -129,7 +129,7 @@ int DLLEXPORT Initialize(cl_enginefunc_t* pEnginefuncs, int iVersion)
 		return 0;
 	}
 
-	HookSdl();
+	NL_Init();
 
 	// get tracker interface, if any
 	return 1;
@@ -243,6 +243,7 @@ void DLLEXPORT HUD_Frame(double time)
 {
 	//	RecClHudFrame(time);
 
+	NL_Update();
 	GetClientVoiceMgr()->Frame(time);
 }
 

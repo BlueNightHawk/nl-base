@@ -22,8 +22,6 @@ void DrawImgui();
 
 void SDLCALL HOOKED_SDL_GL_SwapWindow(SDL_Window* window)
 {
-	gEngfuncs.Con_Printf("Hook Success! \n");
-
 	DrawImgui();
 
 	subhook::ScopedHookRemove remove(&SwapWindowHook);

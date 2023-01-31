@@ -9,6 +9,7 @@ HL_SERVER_SRC_DIR=$(SOURCE_DIR)/dlls
 SUBHOOK_SRC_DIR=$(SOURCE_DIR)/subhook
 IMGUI_SRC_DIR=$(SOURCE_DIR)/imgui
 IMGUI_BACKEND_SRC_DIR=$(SOURCE_DIR)/imgui/backends
+DISCORD_SRC_DIR=$(SOURCE_DIR)/discord-rpc/src
 
 HL1_OBJ_DIR=$(BUILD_OBJ_DIR)/hl1_client
 HL1_PARTICLEMAN_OBJ_DIR=$(BUILD_OBJ_DIR)/particleman
@@ -20,10 +21,11 @@ PM_SHARED_OBJ_DIR=$(HL1_OBJ_DIR)/pm_shared
 SUBHOOK_OBJ_DIR=$(HL1_OBJ_DIR)/subhook
 IMGUI_OBJ_DIR=$(HL1_OBJ_DIR)/imgui
 IMGUI_BACKEND_OBJ_DIR=$(HL1_OBJ_DIR)/imgui/backends
+DISCORD_OBJ_DIR=$(HL1_OBJ_DIR)/discord-rpc/src
 
 CFLAGS=$(BASE_CFLAGS) $(ARCH_CFLAGS) -DCLIENT_DLL
 
-INCLUDEDIRS=-I$(HL_SRC_DIR) -I$(HL_PARTICLEMAN_DIR) -I../dlls -I/usr/include/malloc -I$(COMMON_SRC_DIR) -I$(PUBLIC_SRC_DIR) -I../pm_shared -I../engine -I../utils/vgui/include -I../game_shared -I../external -I../external/SDL2 -I../imgui
+INCLUDEDIRS=-I$(HL_SRC_DIR) -I$(HL_PARTICLEMAN_DIR) -I../dlls -I/usr/include/malloc -I$(COMMON_SRC_DIR) -I$(PUBLIC_SRC_DIR) -I../pm_shared -I../engine -I../utils/vgui/include -I../game_shared -I../external -I../external/SDL2 -I../imgui -I../discord-rpc/include -I../rapidjson/include 
 
 LDFLAGS=$(SHLIBLDFLAGS) $(CPP_LIB) -L$(CFG) vgui.so -L. libSDL2-2.0.so.0 -L libGL.so
 
@@ -53,8 +55,10 @@ HL1_OBJS = \
 	$(HL1_OBJ_DIR)/events.o \
 	$(HL1_OBJ_DIR)/flashlight.o \
 	$(HL1_OBJ_DIR)/GameStudioModelRenderer.o \
+	$(HL1_OBJ_DIR)/gameui.o \
 	$(HL1_OBJ_DIR)/geiger.o \
 	$(HL1_OBJ_DIR)/health.o \
+	$(HL1_OBJ_DIR)/hldiscord.o \
 	$(HL1_OBJ_DIR)/hlimgui_draw.o \
 	$(HL1_OBJ_DIR)/hud_msg.o \
 	$(HL1_OBJ_DIR)/hud_redraw.o \
@@ -64,6 +68,7 @@ HL1_OBJS = \
 	$(HL1_OBJ_DIR)/interpolation.o \
 	$(HL1_OBJ_DIR)/menu.o \
 	$(HL1_OBJ_DIR)/message.o \
+	$(HL1_OBJ_DIR)/nlfuncs.o \
 	$(HL1_OBJ_DIR)/platform_funcs.o \
 	$(HL1_OBJ_DIR)/saytext.o \
 	$(HL1_OBJ_DIR)/sdl_hook.o \
@@ -149,10 +154,17 @@ IMGUI_BACKEND_OBJS = \
 	$(IMGUI_BACKEND_OBJ_DIR)/imgui_impl_opengl2.o \
 	$(IMGUI_BACKEND_OBJ_DIR)/imgui_impl_sdl.o \
 
+DISCORD_OBJS = \
+	$(DISCORD_OBJ_DIR)/connection_unix.o \
+	$(DISCORD_OBJ_DIR)/discord_register_linux.o \
+	$(DISCORD_OBJ_DIR)/discord_rpc.o \
+	$(DISCORD_OBJ_DIR)/rpc_connection.o \
+	$(DISCORD_OBJ_DIR)/serialization.o \
+
 all: client.$(SHLIBEXT)
 
-client.$(SHLIBEXT): $(HL1_OBJS) $(PUBLIC_OBJS) $(COMMON_OBJS) $(GAME_SHARED_OBJS) $(DLL_OBJS) $(PM_SHARED_OBJS) $(SUBHOOK_OBJS) $(IMGUI_OBJS) $(IMGUI_BACKEND_OBJS) $(HL1_PARTICLEMAN_OBJS)
-	$(CPLUS) -o $(BUILD_DIR)/$@ $(HL1_OBJS) $(PUBLIC_OBJS) $(COMMON_OBJS) $(GAME_SHARED_OBJS) $(DLL_OBJS) $(PM_SHARED_OBJS) $(SUBHOOK_OBJS) $(IMGUI_OBJS) $(IMGUI_BACKEND_OBJS) $(HL1_PARTICLEMAN_OBJS) $(LDFLAGS) $(CPP_LIB)
+client.$(SHLIBEXT): $(HL1_OBJS) $(PUBLIC_OBJS) $(COMMON_OBJS) $(GAME_SHARED_OBJS) $(DLL_OBJS) $(PM_SHARED_OBJS) $(SUBHOOK_OBJS) $(IMGUI_OBJS) $(IMGUI_BACKEND_OBJS) $(DISCORD_OBJS) $(HL1_PARTICLEMAN_OBJS)
+	$(CPLUS) -o $(BUILD_DIR)/$@ $(HL1_OBJS) $(PUBLIC_OBJS) $(COMMON_OBJS) $(GAME_SHARED_OBJS) $(DLL_OBJS) $(PM_SHARED_OBJS) $(SUBHOOK_OBJS) $(IMGUI_OBJS) $(IMGUI_BACKEND_OBJS) $(DISCORD_OBJS) $(HL1_PARTICLEMAN_OBJS) $(LDFLAGS) $(CPP_LIB)
 	./gendbg.sh $(BUILD_DIR)/client.$(SHLIBEXT)
 
 $(HL1_OBJ_DIR):
@@ -186,6 +198,9 @@ $(IMGUI_OBJ_DIR):
 
 $(IMGUI_BACKEND_OBJ_DIR):
 	mkdir -p $(IMGUI_BACKEND_OBJ_DIR)
+
+$(DISCORD_OBJ_DIR):
+	mkdir -p $(DISCORD_OBJ_DIR)
 
 $(HL1_OBJ_DIR)/%.o: $(HL_SRC_DIR)/%.cpp $(filter-out $(wildcard  $(HL1_OBJ_DIR)),  $(HL1_OBJ_DIR))
 	$(DO_CC)
@@ -224,6 +239,9 @@ $(IMGUI_OBJ_DIR)/%.o : $(IMGUI_SRC_DIR)/%.cpp $(filter-out $(wildcard  $(IMGUI_O
 	$(DO_CC)
 
 $(IMGUI_BACKEND_OBJ_DIR)/%.o : $(IMGUI_BACKEND_SRC_DIR)/%.cpp $(filter-out $(wildcard  $(IMGUI_BACKEND_OBJ_DIR)),  $(IMGUI_BACKEND_OBJ_DIR))
+	$(DO_CC)
+
+$(DISCORD_OBJ_DIR)/%.o : $(DISCORD_SRC_DIR)/%.cpp $(filter-out $(wildcard  $(DISCORD_OBJ_DIR)),  $(DISCORD_OBJ_DIR))
 	$(DO_CC)
 
 clean:

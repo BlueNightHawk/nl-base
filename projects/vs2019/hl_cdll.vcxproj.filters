@@ -70,6 +70,21 @@
     <Filter Include="Source Files\imgui">
       <UniqueIdentifier>{a6005f45-752d-43f4-9280-a18f875810b9}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Source Files\discord">
+      <UniqueIdentifier>{17db7ad7-d860-4877-b497-1c1e99becfcf}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\nl">
+      <UniqueIdentifier>{8c7d59ca-312f-4060-969b-d93e85f98f5a}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\nl\discord">
+      <UniqueIdentifier>{db8a28d9-641e-446f-a0df-406159d413ef}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\nl\imgui">
+      <UniqueIdentifier>{f0a8574f-d9a6-4397-8703-746322eedf41}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\nl">
+      <UniqueIdentifier>{7c1ad745-a271-4923-8c31-27b502cb6a29}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\dlls\crossbow.cpp">
@@ -330,9 +345,6 @@
     <ClCompile Include="..\..\subhook\subhook.c">
       <Filter>Source Files\subhook</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\cl_dll\sdl_hook.cpp">
-      <Filter>Source Files\cl_dll</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\imgui\imgui.cpp">
       <Filter>Source Files\imgui</Filter>
     </ClCompile>
@@ -357,11 +369,41 @@
     <ClCompile Include="..\..\cl_dll\sdl2_stub.cpp">
       <Filter>Source Files\imgui</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\cl_dll\hlimgui_draw.cpp">
-      <Filter>Source Files\imgui</Filter>
+    <ClCompile Include="..\..\discord-rpc\src\connection_win.cpp">
+      <Filter>Source Files\discord</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\discord-rpc\src\discord_register_win.cpp">
+      <Filter>Source Files\discord</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\discord-rpc\src\discord_rpc.cpp">
+      <Filter>Source Files\discord</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\discord-rpc\src\dllmain.cpp">
+      <Filter>Source Files\discord</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\discord-rpc\src\rpc_connection.cpp">
+      <Filter>Source Files\discord</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\discord-rpc\src\serialization.cpp">
+      <Filter>Source Files\discord</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\cl_dll\nlfuncs.cpp">
+      <Filter>Source Files\nl</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\cl_dll\sdl_hook.cpp">
+      <Filter>Source Files\nl</Filter>
     </ClCompile>
     <ClCompile Include="..\..\cl_dll\platform_funcs.cpp">
-      <Filter>Source Files\cl_dll</Filter>
+      <Filter>Source Files\nl</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\cl_dll\hlimgui_draw.cpp">
+      <Filter>Source Files\nl\imgui</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\cl_dll\hldiscord.cpp">
+      <Filter>Source Files\nl\discord</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\cl_dll\gameui.cpp">
+      <Filter>Source Files\nl</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -637,6 +679,15 @@
     </ClInclude>
     <ClInclude Include="..\..\cl_dll\particleman\CBaseParticle.h">
       <Filter>Header Files\cl_dll\particleman</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\cl_dll\hldiscord.h">
+      <Filter>Header Files\nl</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\cl_dll\nlfuncs.h">
+      <Filter>Header Files\nl</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\cl_dll\igameui.h">
+      <Filter>Header Files\nl</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>
