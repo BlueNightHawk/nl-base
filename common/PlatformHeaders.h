@@ -73,3 +73,8 @@
 //Add core Linux headers here if you need them
 #include <dlfcn.h>
 #endif
+
+// Shared platform functions
+void* PL_GetModuleHandle(const char *file);
+void* PL_GetProcAddress(void* handle, const char* proc);
+void PL_FreeLibrary(void* handle);

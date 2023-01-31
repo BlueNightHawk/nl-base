@@ -5,6 +5,12 @@
 #include "PlatformHeaders.h"
 #include <assert.h>
 
+#ifdef WIN32
+#define SDL2_PLATFORM "SDL2.dll"
+#else
+#define SDL2_PLATFORM "./libSDL2.so"
+#endif
+
 subhook::Hook SwapWindowHook;
 
 typedef void (*pfnSDL_GL_SwapWindow)(SDL_Window* window);
@@ -29,23 +35,9 @@ void SDLCALL HOOKED_SDL_GL_SwapWindow(SDL_Window* window)
 
 void* GetSwapWindowPtr()
 {
-#ifdef WIN32
-	HMODULE m_SDL2;
-	m_SDL2 = GetModuleHandle("SDL2.dll");
-	assert(m_SDL2 != 0);
+	void* hSDL2 = PL_GetModuleHandle(SDL2_PLATFORM);
 
-	return (void*)GetProcAddress(m_SDL2, "SDL_GL_SwapWindow");
-#else
-	void *handle = dlopen("./libSDL2.so", RTLD_NOW);
-	void* func = nullptr;
-	assert(handle != nullptr);
-
-	func = (void *)dlsym(handle, "SDL_GL_SwapWindow");
-
-	//dlclose(handle);
-
-	return func;
-#endif
+	return PL_GetProcAddress(hSDL2, "SDL_GL_SwapWindow");
 }
 
 void HookSdl()

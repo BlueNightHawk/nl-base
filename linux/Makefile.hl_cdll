@@ -25,7 +25,7 @@ CFLAGS=$(BASE_CFLAGS) $(ARCH_CFLAGS) -DCLIENT_DLL
 
 INCLUDEDIRS=-I$(HL_SRC_DIR) -I$(HL_PARTICLEMAN_DIR) -I../dlls -I/usr/include/malloc -I$(COMMON_SRC_DIR) -I$(PUBLIC_SRC_DIR) -I../pm_shared -I../engine -I../utils/vgui/include -I../game_shared -I../external -I../external/SDL2 -I../imgui
 
-LDFLAGS=$(SHLIBLDFLAGS) $(CPP_LIB) -L$(CFG) vgui.so -L. libSDL2-2.0.so.0 -lopengl32
+LDFLAGS=$(SHLIBLDFLAGS) $(CPP_LIB) -L$(CFG) vgui.so -L. libSDL2-2.0.so.0 -L libGL.so
 
 DO_CC=$(CPLUS) $(INCLUDEDIRS) $(CFLAGS) -o $@ -c $<
 
@@ -55,6 +55,7 @@ HL1_OBJS = \
 	$(HL1_OBJ_DIR)/GameStudioModelRenderer.o \
 	$(HL1_OBJ_DIR)/geiger.o \
 	$(HL1_OBJ_DIR)/health.o \
+	$(HL1_OBJ_DIR)/hlimgui_draw.o \
 	$(HL1_OBJ_DIR)/hud_msg.o \
 	$(HL1_OBJ_DIR)/hud_redraw.o \
 	$(HL1_OBJ_DIR)/hud_update.o \
@@ -63,10 +64,10 @@ HL1_OBJS = \
 	$(HL1_OBJ_DIR)/interpolation.o \
 	$(HL1_OBJ_DIR)/menu.o \
 	$(HL1_OBJ_DIR)/message.o \
+	$(HL1_OBJ_DIR)/platform_funcs.o \
 	$(HL1_OBJ_DIR)/saytext.o \
 	$(HL1_OBJ_DIR)/sdl_hook.o \
 	$(HL1_OBJ_DIR)/sdl2_stub.o \
-	$(HL1_OBJ_DIR)/imgui_test.o \
 	$(HL1_OBJ_DIR)/status_icons.o \
 	$(HL1_OBJ_DIR)/statusbar.o \
 	$(HL1_OBJ_DIR)/studio_util.o \
@@ -219,10 +220,10 @@ $(PM_SHARED_OBJ_DIR)/%.o : $(PM_SRC_DIR)/%.cpp $(filter-out $(wildcard  $(PM_SHA
 $(SUBHOOK_OBJ_DIR)/%.o : $(SUBHOOK_SRC_DIR)/%.c $(filter-out $(wildcard  $(SUBHOOK_OBJ_DIR)),  $(SUBHOOK_OBJ_DIR))
 	$(DO_CC)
 
-$(IMGUI_OBJ_DIR)/%.o : $(IMGUI_SRC_DIR)/%.c $(filter-out $(wildcard  $(IMGUI_OBJ_DIR)),  $(IMGUI_OBJ_DIR))
+$(IMGUI_OBJ_DIR)/%.o : $(IMGUI_SRC_DIR)/%.cpp $(filter-out $(wildcard  $(IMGUI_OBJ_DIR)),  $(IMGUI_OBJ_DIR))
 	$(DO_CC)
 
-$(IMGUI_BACKEND_OBJ_DIR)/%.o : $(IMGUI_BACKEND_SRC_DIR)/%.c $(filter-out $(wildcard  $(IMGUI_BACKEND_OBJ_DIR)),  $(IMGUI_BACKEND_OBJ_DIR))
+$(IMGUI_BACKEND_OBJ_DIR)/%.o : $(IMGUI_BACKEND_SRC_DIR)/%.cpp $(filter-out $(wildcard  $(IMGUI_BACKEND_OBJ_DIR)),  $(IMGUI_BACKEND_OBJ_DIR))
 	$(DO_CC)
 
 clean:

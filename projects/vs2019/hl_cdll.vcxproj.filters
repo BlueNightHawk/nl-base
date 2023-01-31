@@ -354,11 +354,14 @@
     <ClCompile Include="..\..\imgui\backends\imgui_impl_sdl.cpp">
       <Filter>Source Files\imgui</Filter>
     </ClCompile>
-    <ClCompile Include="imgui_test.cpp">
-      <Filter>Source Files\imgui</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\cl_dll\sdl2_stub.cpp">
       <Filter>Source Files\imgui</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\cl_dll\hlimgui_draw.cpp">
+      <Filter>Source Files\imgui</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\cl_dll\platform_funcs.cpp">
+      <Filter>Source Files\cl_dll</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
