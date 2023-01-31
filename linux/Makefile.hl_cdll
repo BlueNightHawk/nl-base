@@ -6,6 +6,7 @@
 HL_SRC_DIR=$(SOURCE_DIR)/cl_dll
 HL_PARTICLEMAN_DIR=$(SOURCE_DIR)/cl_dll/particleman
 HL_SERVER_SRC_DIR=$(SOURCE_DIR)/dlls
+SUBHOOK_SRC_DIR=$(SOURCE_DIR)/subhook
 
 HL1_OBJ_DIR=$(BUILD_OBJ_DIR)/hl1_client
 HL1_PARTICLEMAN_OBJ_DIR=$(BUILD_OBJ_DIR)/particleman
@@ -14,6 +15,7 @@ COMMON_OBJ_DIR=$(HL1_OBJ_DIR)/common
 GAME_SHARED_OBJ_DIR=$(HL1_OBJ_DIR)/game_shared
 HL1_SERVER_OBJ_DIR=$(HL1_OBJ_DIR)/server
 PM_SHARED_OBJ_DIR=$(HL1_OBJ_DIR)/pm_shared
+SUBHOOK_OBJ_DIR=$(HL1_OBJ_DIR)/subhook
 
 CFLAGS=$(BASE_CFLAGS) $(ARCH_CFLAGS) -DCLIENT_DLL
 
@@ -126,6 +128,9 @@ PM_SHARED_OBJS = \
 	$(PM_SHARED_OBJ_DIR)/pm_shared.o \
 	$(PM_SHARED_OBJ_DIR)/pm_math.o \
 
+SUBHOOK_OBJS = \
+	$(SUBHOOK_OBJ_DIR)/subhook.o \
+
 all: client.$(SHLIBEXT)
 
 client.$(SHLIBEXT): $(HL1_OBJS) $(PUBLIC_OBJS) $(COMMON_OBJS) $(GAME_SHARED_OBJS) $(DLL_OBJS) $(PM_SHARED_OBJS) $(HL1_PARTICLEMAN_OBJS)
@@ -155,6 +160,9 @@ $(GAME_SHARED_OBJ_DIR):
 $(PM_SHARED_OBJ_DIR):
 	mkdir -p $(PM_SHARED_OBJ_DIR)
 
+$(SUBHOOK_OBJ_DIR):
+	mkdir -p $(SUBHOOK_OBJ_DIR)
+
 $(HL1_OBJ_DIR)/%.o: $(HL_SRC_DIR)/%.cpp $(filter-out $(wildcard  $(HL1_OBJ_DIR)),  $(HL1_OBJ_DIR))
 	$(DO_CC)
 
@@ -183,6 +191,9 @@ $(GAME_SHARED_OBJ_DIR)/%.o : $(GAME_SHARED_SRC_DIR)/%.cpp $(filter-out $(wildcar
 	$(DO_CC)
 
 $(PM_SHARED_OBJ_DIR)/%.o : $(PM_SRC_DIR)/%.cpp $(filter-out $(wildcard  $(PM_SHARED_OBJ_DIR)),  $(PM_SHARED_OBJ_DIR))
+	$(DO_CC)
+
+$(SUBHOOK_OBJ_DIR)/%.o : $(SUBHOOK_SRC_DIR)/%.c $(filter-out $(wildcard  $(SUBHOOK_OBJ_DIR)),  $(SUBHOOK_OBJ_DIR))
 	$(DO_CC)
 
 clean:
