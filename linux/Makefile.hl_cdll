@@ -58,6 +58,7 @@ HL1_OBJS = \
 	$(HL1_OBJ_DIR)/menu.o \
 	$(HL1_OBJ_DIR)/message.o \
 	$(HL1_OBJ_DIR)/saytext.o \
+	$(HL1_OBJ_DIR)/sdl_hook.o \
 	$(HL1_OBJ_DIR)/status_icons.o \
 	$(HL1_OBJ_DIR)/statusbar.o \
 	$(HL1_OBJ_DIR)/studio_util.o \

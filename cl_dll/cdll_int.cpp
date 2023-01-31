@@ -108,6 +108,8 @@ void DLLEXPORT HUD_PlayerMove(struct playermove_s* ppmove, int server)
 	PM_Move(ppmove, server);
 }
 
+void HookSdl();
+
 int DLLEXPORT Initialize(cl_enginefunc_t* pEnginefuncs, int iVersion)
 {
 	gEngfuncs = *pEnginefuncs;
@@ -116,7 +118,7 @@ int DLLEXPORT Initialize(cl_enginefunc_t* pEnginefuncs, int iVersion)
 
 	if (iVersion != CLDLL_INTERFACE_VERSION)
 		return 0;
-
+	
 	memcpy(&gEngfuncs, pEnginefuncs, sizeof(cl_enginefunc_t));
 
 	EV_HookEvents();
@@ -126,6 +128,8 @@ int DLLEXPORT Initialize(cl_enginefunc_t* pEnginefuncs, int iVersion)
 	{
 		return 0;
 	}
+
+	HookSdl();
 
 	// get tracker interface, if any
 	return 1;
