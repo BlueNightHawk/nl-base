@@ -5,14 +5,26 @@
 #include "PlatformHeaders.h"
 #include <assert.h>
 
-subhook::Hook foo_hook;
+subhook::Hook SwapWindowHook;
 
-typedef void (*pSDL_GL_SwapWindow)(SDL_Window* window);
+typedef void (*pfnSDL_GL_SwapWindow)(SDL_Window* window);
+
+pfnSDL_GL_SwapWindow pSDL_GL_SwapWindow = nullptr; 
+
+void InitImgui();
+void DrawImgui();
 
 void SDLCALL HOOKED_SDL_GL_SwapWindow(SDL_Window* window)
 {
-	gEngfuncs.Con_Printf("Hook Success! \m");
-	((pSDL_GL_SwapWindow)foo_hook.GetTrampoline())(window);
+	gEngfuncs.Con_Printf("Hook Success! \n");
+
+	DrawImgui();
+
+	subhook::ScopedHookRemove remove(&SwapWindowHook);
+
+	pSDL_GL_SwapWindow(window);
+
+	SwapWindowHook.Install((void*)pSDL_GL_SwapWindow, (void*)&HOOKED_SDL_GL_SwapWindow);
 }
 
 void* GetSwapWindowPtr()
@@ -24,7 +36,7 @@ void* GetSwapWindowPtr()
 
 	return (void*)GetProcAddress(m_SDL2, "SDL_GL_SwapWindow");
 #else
-	void *handle = dlopen("./sdl2.so", RTLD_NOW);
+	void *handle = dlopen("./libSDL2.so", RTLD_NOW);
 	void* func = nullptr;
 	assert(handle != nullptr);
 
@@ -38,5 +50,12 @@ void* GetSwapWindowPtr()
 
 void HookSdl()
 {
-	foo_hook.Install((void*)GetSwapWindowPtr(), (void*)&HOOKED_SDL_GL_SwapWindow);
+	pSDL_GL_SwapWindow = (pfnSDL_GL_SwapWindow)GetSwapWindowPtr();
+
+	if (pSDL_GL_SwapWindow == nullptr)
+		return;
+
+	SwapWindowHook.Install((void*)pSDL_GL_SwapWindow, (void*)&HOOKED_SDL_GL_SwapWindow);
+
+	InitImgui();
 }
