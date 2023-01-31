@@ -12,16 +12,17 @@
 #endif
 
 subhook::Hook SwapWindowHook;
+extern SDL_Window* window;
 
 typedef void (*pfnSDL_GL_SwapWindow)(SDL_Window* window);
 
 pfnSDL_GL_SwapWindow pSDL_GL_SwapWindow = nullptr; 
 
-void InitImgui();
 void DrawImgui();
 
 void SDLCALL HOOKED_SDL_GL_SwapWindow(SDL_Window* window)
 {
+	::window = window;
 	DrawImgui();
 
 	subhook::ScopedHookRemove remove(&SwapWindowHook);
@@ -46,6 +47,4 @@ void HookSdl()
 		return;
 
 	SwapWindowHook.Install((void*)pSDL_GL_SwapWindow, (void*)&HOOKED_SDL_GL_SwapWindow);
-
-	InitImgui();
 }

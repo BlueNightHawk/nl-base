@@ -29,7 +29,6 @@ void InitDiscord()
 
 void UpdatePresence()
 {
-	char buffer[256];
 	DiscordRichPresence discordPresence;
 	memset(&discordPresence, 0, sizeof(discordPresence));
 	discordPresence.largeImageKey = "default";
@@ -50,6 +49,11 @@ void UpdatePresence()
 	{
 		discordPresence.state = gEngfuncs.pfnGetLevelName() + 5;
 	}
+
+#ifndef WIN32
+	discordPresence.smallImageKey = "tux";
+	discordPresence.smallImageText = "Linux Gaming!";
+#endif
 
 	Discord_UpdatePresence(&discordPresence);
 }

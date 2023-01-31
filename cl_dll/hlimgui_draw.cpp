@@ -11,6 +11,8 @@
 
 SDL_Window* window = nullptr;
 
+static bool g_bImGuiInit = false;
+
 int ProcessEvent(void* userdata, SDL_Event* event)
 {
 	return ImGui_ImplSDL2_ProcessEvent(event);
@@ -27,19 +29,6 @@ bool CanShowMenu()
 
 void InitImgui()
 {
-    int i = 0;
-	SDL_Window* pNextWindow = nullptr;
-	while (1)
-    {  
-	    pNextWindow = SDL_GetWindowFromID(i);
-
-		if (!pNextWindow && i > 0)
-			break;
-
-		window = pNextWindow;
-        i++;   
-    }
-
 	assert(window != nullptr);
 
 	// Setup Dear ImGui context
@@ -50,22 +39,23 @@ void InitImgui()
 
 	io.ConfigFlags |= ImGuiConfigFlags_NoMouseCursorChange;
 
-    SDL_GLContext gl_context = SDL_GL_CreateContext(window);
-    SDL_GL_MakeCurrent(window, gl_context);
-
 	// Setup Dear ImGui style
 	ImGui::StyleColorsDark();
-	// ImGui::StyleColorsLight();
 
 	// Setup Platform/Renderer backends
-	ImGui_ImplSDL2_InitForOpenGL(window, gl_context);
+	ImGui_ImplSDL2_InitForOpenGL(window, ImGui::GetCurrentContext());
 	ImGui_ImplOpenGL2_Init();
 
 	SDL_AddEventWatch(&ProcessEvent, nullptr);
+
+	g_bImGuiInit = true;
 }
 
 void DrawImgui()
 {
+	if (!g_bImGuiInit)
+		InitImgui();
+
     ImGuiIO& io = ImGui::GetIO();
 
 	// Start the Dear ImGui frame
