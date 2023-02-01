@@ -4,6 +4,10 @@
 #include <fstream>
 #include <assert.h>
 
+#ifndef WIN32
+#include <unistd.h>
+#endif
+
 void* PL_GetModuleHandle(const char* file)
 {
 #ifdef WIN32
@@ -35,8 +39,8 @@ void PL_FreeLibrary(void* handle)
 
 struct moduleinfo_t
 {
-	ULONG ulBase;
-	ULONG ulSize;
+	unsigned long ulBase;
+	unsigned long ulSize;
 	std::string sName;
 };
 
