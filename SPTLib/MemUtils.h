@@ -103,7 +103,7 @@ inline void AddSymbolLookupHook(void* moduleHandle, void* original, void* target
 
 inline void* GetSymbolAddress(void* moduleHandle, const char* functionName)
 {
-	return GetProcAddress(reinterpret_cast<HMODULE>(moduleHandle), functionName);
+	return PL_GetProcAddress(moduleHandle, functionName);
 }
 
 inline uintptr_t find_pattern(const void* start, size_t length, const PatternWrapper& pattern)
@@ -139,7 +139,7 @@ inline Iterator find_first_sequence(
 	return end;
 }
 
-
+#if 0
 inline void MarkAsExecutable(void* addr)
 {
 	if (!addr)
@@ -193,7 +193,7 @@ inline void ReplaceBytes(void* addr, size_t length, const uint8_t* newBytes)
 	if (result)
 		VirtualProtect(addr, length, dwOldProtect, &dwOldProtect);
 }
-
+#endif
 template <typename Result, class Iterator>
 inline Iterator find_first_sequence(
 	const void* start,

@@ -31,10 +31,12 @@ void PL_FreeLibrary(void* handle)
 #endif
 }
 
+#ifndef WIN32
+
 struct moduleinfo_t
 {
-	unsigned long ulBase;
-	unsigned long ulSize;
+	ULONG ulBase;
+	ULONG ulSize;
 	std::string sName;
 };
 
@@ -53,8 +55,8 @@ moduleinfo_t QueryModule(unsigned int uiPID, const std::string& sModuleName)
 	{
 		if (sLineIn.find(sModuleName) != std::string::npos)
 		{
-			toRet.ulBase = std::stoi(sLineIn.substr(0, 8), nullptr, 16);
-			toRet.ulSize = std::stoi(sLineIn.substr(9, 8), nullptr, 16) - toRet.ulBase;
+			toRet.ulBase = std::stoul(sLineIn.substr(0, 8), nullptr, 16);
+			toRet.ulSize = std::stoul(sLineIn.substr(9, 8), nullptr, 16) - toRet.ulBase;
 			toRet.sName = sModuleName;
 			break;
 		}
@@ -65,8 +67,11 @@ moduleinfo_t QueryModule(unsigned int uiPID, const std::string& sModuleName)
 
 void PL_GetModuleInfo(std::string modulename, void* moduleHandle, void** moduleBase, size_t* moduleSize)
 {
-	auto moduleClient = QueryModule(0, modulename);
+	auto moduleClient = QueryModule(getpid(), modulename);
 	moduleHandle = PL_GetModuleHandle(modulename.c_str());
 	*moduleBase = (void *)moduleClient.ulBase;
 	*moduleSize = moduleClient.ulSize;
 }
+
+
+#endif

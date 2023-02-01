@@ -31,7 +31,7 @@ inline std::vector<subhook::Hook> g_Hooks;
 		{                                                                                                                                  \
 			gEngfuncs.Con_DPrintf("[hw dll] Found " #future_name " at %p (using the %s pattern).\n", ORIG_##future_name, pattern->name()); \
 			void* p##future_name = (void*)ORIG_##future_name;                                                                              \
-			hook.Install(p##future_name, (void*)##future_name);                                              \
+			hook.Install(p##future_name, (void*)future_name);                                              \
 		}                                                                                                                                  \
 		else                                                                                                                               \
 		{                                                                                                                                  \

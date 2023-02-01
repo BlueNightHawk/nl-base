@@ -4,7 +4,11 @@
  * Concatenate with empty because otherwise the MSVC preprocessor
  * puts all __VA_ARGS__ arguments into the first one.
  */
+#ifdef WIN32
 #define MAKE_PATTERN_1(name, pattern_name, pattern, ...) static constexpr auto ptn_##name##_1 = PATTERN(pattern);
+#else
+#define MAKE_PATTERN_1(name, pattern_name, pattern, ...) static auto ptn_##name##_1 = PATTERN(pattern);
+#endif
 #define MAKE_PATTERN_2(name, pattern_name, pattern, ...)     \
 	static constexpr auto ptn_##name##_2 = PATTERN(pattern); \
 	CONCATENATE(MAKE_PATTERN_1(name, __VA_ARGS__), )

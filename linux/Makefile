@@ -39,7 +39,7 @@ else
 	ARCH_CFLAGS+=-gdwarf-2 -g2 
 endif
 
-BASE_CFLAGS=-std=c++17 -fpermissive -fno-strict-aliasing -fno-exceptions -fexpensive-optimizations -Werror=return-type -w
+BASE_CFLAGS=-std=c++17 -fpermissive -fno-strict-aliasing -fexceptions -fexpensive-optimizations -Werror=return-type -w
 BASE_CFLAGS+=-DNDEBUG -DPOSIX -D_POSIX -DLINUX -D_LINUX -DGNUC -DNO_MALLOC_OVERRIDE -DCLIENT_WEAPONS
 
 SHLIBEXT=so

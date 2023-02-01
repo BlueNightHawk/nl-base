@@ -5,5 +5,5 @@
 #include "PlatformHeaders.h"
 #include "Utils.hpp"
 #include "../../subhook/subhook.h"
-#include "regs_patterns.hpp"
-#include "regs_enginehook.h"
+#include "reGS_patterns.hpp"
+#include "reGS_enginehook.h"

@@ -25,7 +25,7 @@ DISCORD_OBJ_DIR=$(HL1_OBJ_DIR)/discord-rpc/src
 
 CFLAGS=$(BASE_CFLAGS) $(ARCH_CFLAGS) -DCLIENT_DLL
 
-INCLUDEDIRS=-I$(HL_SRC_DIR) -I$(HL_PARTICLEMAN_DIR) -I../dlls -I/usr/include/malloc -I$(COMMON_SRC_DIR) -I$(PUBLIC_SRC_DIR) -I../pm_shared -I../engine -I../utils/vgui/include -I../game_shared -I../external -I../external/SDL2 -I../imgui -I../discord-rpc/include -I../rapidjson/include -I../../SPTLib 
+INCLUDEDIRS=-I$(HL_SRC_DIR) -I$(HL_PARTICLEMAN_DIR) -I../dlls -I/usr/include/malloc -I$(COMMON_SRC_DIR) -I$(PUBLIC_SRC_DIR) -I../pm_shared -I../engine -I../utils/vgui/include -I../game_shared -I../external -I../external/SDL2 -I../imgui -I../discord-rpc/include -I../rapidjson/include -I../SPTLib 
 
 LDFLAGS=$(SHLIBLDFLAGS) $(CPP_LIB) -L$(CFG) vgui.so -L. libSDL2-2.0.so.0 -L libGL.so
 
