@@ -74,7 +74,10 @@
 #include <dlfcn.h>
 #endif
 
+#include <string>
+
 // Shared platform functions
 void* PL_GetModuleHandle(const char *file);
 void* PL_GetProcAddress(void* handle, const char* proc);
 void PL_FreeLibrary(void* handle);
+void PL_GetModuleInfo(std::string modulename, void* moduleHandle, void** moduleBase, size_t* moduleSize);
