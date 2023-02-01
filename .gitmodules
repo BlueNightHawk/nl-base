@@ -7,3 +7,6 @@
 [submodule "rapidjson"]
 	path = rapidjson
 	url = https://github.com/Tencent/rapidjson
+[submodule "subhook"]
+	path = subhook
+	url = https://github.com/BlueNightHawk/subhook
