@@ -1,28 +1,36 @@
-#ifdef UTILS_HPP_RECURSE_GUARD
-#error Recursive header files inclusion detected in Utils.hpp
-#else //UTILS_HPP_RECURSE_GUARD
-
-#define UTILS_HPP_RECURSE_GUARD
-
-#ifndef UTILS_HPP_GUARD
-#define UTILS_HPP_GUARD
 #pragma once
 
-#include <array>
+#include <cstddef>
+#include <string>
+using std::size_t;
+
 #include "MemUtils.hpp"
 #include "patterns.hpp"
-#include <functional>
 
-typedef struct Utils
+class IHookableModule
 {
-	Utils(void* handle, void* base, size_t length)
-	{
-		this->m_Handle = handle;
-		this->m_Base = base;
-		this->m_Length = length;
-	}
+public:
+	virtual ~IHookableModule() {}
+	virtual bool CanHook(const std::wstring& moduleFullName) = 0;
+	virtual void* GetHandle();
+	virtual std::wstring GetName();
+	virtual void* GetBase();
+	virtual size_t GetLength();
 
-	template <typename Result, size_t N>
+	virtual void Hook(const std::wstring& moduleName, void* moduleHandle, void* moduleBase, size_t moduleLength, bool needToIntercept) = 0;
+	virtual void Unhook() = 0;
+	virtual void Clear();
+
+	virtual void TryHookAll(bool needToIntercept) = 0;
+
+	/*
+	 * If I don't have these reinterpret_cast<uintptr_t&>'s here, the underlying std::async
+	 * will be called a lot of times, each with a different argument type. This will lead to it
+	 * generating a huge amount of duplicate code in the binary (over 100 KB). For some reason the
+	 * optimizer does not merge the said code together. Anyway, Result is usually some function
+	 * pointer, so this works well.
+	 */
+	template<typename Result, size_t N>
 	inline auto FindAsync(
 		Result& address,
 		const std::array<patterns::PatternWrapper, N>& patterns)
@@ -35,7 +43,7 @@ typedef struct Utils
 			patterns.cend());
 	}
 
-	template <typename Result, size_t N>
+	template<typename Result, size_t N>
 	inline auto FindAsync(
 		Result& address,
 		const std::array<patterns::PatternWrapper, N>& patterns,
@@ -50,7 +58,7 @@ typedef struct Utils
 			onFound);
 	}
 
-	template <typename Result, size_t N>
+	template<typename Result, size_t N>
 	inline auto FindFunctionAsync(
 		Result& address,
 		const char* name,
@@ -66,7 +74,7 @@ typedef struct Utils
 			patterns.cend());
 	}
 
-	template <typename Result, size_t N>
+	template<typename Result, size_t N>
 	inline auto FindFunctionAsync(
 		Result& address,
 		const char* name,
@@ -85,12 +93,9 @@ typedef struct Utils
 	}
 
 protected:
-	void* m_Handle;
-	void* m_Base;
+	void *m_Handle;
+	void *m_Base;
 	size_t m_Length;
-} Utils;
-
-#endif //UTILS_HPP_GUARD
-
-#undef UTILS_HPP_RECURSE_GUARD
-#endif //UTILS_HPP_RECURSE_GUARDS
+	std::wstring m_Name;
+	bool m_Intercepted;
+};

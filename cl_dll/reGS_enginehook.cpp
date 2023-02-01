@@ -6,7 +6,7 @@
 #ifdef WIN32
 #define HWEXT "hw.dll"
 #else
-#define HWEXT "./hw.so"
+#define HWEXT "hw.so"
 #endif
 
 Utils utils = Utils::Utils(NULL, NULL, NULL);

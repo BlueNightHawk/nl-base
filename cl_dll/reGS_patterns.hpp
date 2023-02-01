@@ -11,7 +11,7 @@
 #pragma once
 
 #include "patterns.hpp"
-#include "MemUtils.h"
+#include "MemUtils.hpp"
 
 namespace patterns
 {

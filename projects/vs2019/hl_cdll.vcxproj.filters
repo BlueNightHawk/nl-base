@@ -417,6 +417,15 @@
     <ClCompile Include="..\..\cl_dll\reGS_enginehook.cpp">
       <Filter>Source Files\nl\reGS</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\SPTLib\MemUtils.cpp">
+      <Filter>Source Files\SPTLib</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\SPTLib\Windows\MemUtils_win.cpp">
+      <Filter>Source Files\SPTLib</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\SPTLib\Windows\DetoursUtils.cpp">
+      <Filter>Source Files\SPTLib</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\cl_dll\kbutton.h">
@@ -700,24 +709,6 @@
     </ClInclude>
     <ClInclude Include="..\..\cl_dll\igameui.h">
       <Filter>Header Files\nl</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\SPTLib\DetoursUtils.hpp">
-      <Filter>Header Files\SPTLib</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\SPTLib\MemUtils.h">
-      <Filter>Header Files\SPTLib</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\SPTLib\patterns.hpp">
-      <Filter>Header Files\SPTLib</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\SPTLib\patterns_macros.hpp">
-      <Filter>Header Files\SPTLib</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\SPTLib\sptlib-stdafx.hpp">
-      <Filter>Header Files\SPTLib</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\SPTLib\Utils.hpp">
-      <Filter>Header Files\SPTLib</Filter>
     </ClInclude>
     <ClInclude Include="..\..\cl_dll\reGS.h">
       <Filter>Header Files\nl</Filter>
