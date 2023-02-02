@@ -10,3 +10,6 @@
 [submodule "subhook"]
 	path = subhook
 	url = https://github.com/BlueNightHawk/subhook
+[submodule "soloud"]
+	path = soloud
+	url = https://github.com/jarikomppa/soloud

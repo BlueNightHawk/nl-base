@@ -328,40 +328,6 @@ SDL_FORCE_INLINE void *SDL_memset_inline(void *dst, int c, size_t len) { return 
 #define SDL_zero(x) SDL_memset(&(x), 0, sizeof((x)))
 #define SDL_zerop(x) SDL_memset((x), 0, sizeof(*(x)))
 
-/* !!! FIXME: does this _really_ beat memset() on any modern platform? */
-SDL_FORCE_INLINE void SDL_memset4(void *dst, int val, size_t len)
-{
-#if defined(__GNUC__) && defined(i386)
-    int u0, u1, u2;
-    __asm__ __volatile__ (
-        "cld \n\t"
-        "rep ; stosl \n\t"
-        : "=&D" (u0), "=&a" (u1), "=&c" (u2)
-        : "0" (dst), "1" (val), "2" (SDL_static_cast(Uint32, len))
-        : "memory"
-    );
-/* !!! FIXME: amd64? */
-#else
-    size_t _n = (len + 3) / 4;
-    Uint32 *_p = SDL_static_cast(Uint32 *, dst);
-    Uint32 _val = (val);
-    if (len == 0)
-        return;
-    switch (len % 4)
-    {
-        case 0: do {    *_p++ = _val;
-			[[fallthrough]];
-        case 3:         *_p++ = _val;
-			[[fallthrough]];
-        case 2:         *_p++ = _val;
-			[[fallthrough]];
-        case 1:         *_p++ = _val;
-        } while ( --_n );
-    }
-#endif
-}
-
-
 extern DECLSPEC void *SDLCALL SDL_memcpy(void *dst, const void *src, size_t len);
 #if defined(__MACOSX__)
 SDL_FORCE_INLINE void *SDL_memcpy_inline(void *dst, const void *src, size_t len)

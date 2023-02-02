@@ -2870,7 +2870,7 @@ void CBasePlayer::Spawn()
 	m_lastx = m_lasty = 0;
 
 	m_flNextChatTime = gpGlobals->time;
-
+	
 	g_pGameRules->PlayerSpawn(this);
 }
 
@@ -2932,7 +2932,7 @@ bool CBasePlayer::Restore(CRestore& restore)
 	if (0 == pSaveData->fUseLandmark)
 	{
 		ALERT(at_console, "No Landmark:%s\n", pSaveData->szLandmarkName);
-
+		
 		// default to normal spawn
 		edict_t* pentSpawnSpot = EntSelectSpawnPoint(this);
 		pev->origin = VARS(pentSpawnSpot)->origin + Vector(0, 0, 1);
@@ -3925,7 +3925,7 @@ reflecting all of the HUD state info.
 void CBasePlayer::UpdateClientData()
 {
 	const bool fullHUDInitRequired = m_fInitHUD != false;
-
+	
 	if (m_fInitHUD)
 	{
 		m_fInitHUD = false;
@@ -3954,6 +3954,8 @@ void CBasePlayer::UpdateClientData()
 		FireTargets("game_playerspawn", this, this, USE_TOGGLE, 0);
 
 		InitStatusBar();
+
+		CLIENT_COMMAND(edict(), "cd stop\n");
 	}
 
 	if (m_iHideHUD != m_iClientHideHUD)
