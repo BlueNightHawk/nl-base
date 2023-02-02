@@ -11,7 +11,7 @@ bool HWHook()
 	void* base;
 	size_t size;
 
-	if (!MemUtils::GetModuleInfo(HWEXT, &handle, &base, &size))
+	if (!MemUtils::GetModuleInfo(WHWEXT, &handle, &base, &size))
 		return false;
 
 	utils = Utils::Utils(handle, base, size);

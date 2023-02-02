@@ -1,9 +1,11 @@
 #pragma once
 
 #ifdef WIN32
-#define HWEXT L"hw.dll"
+#define HWEXT "hw.dll"
+#define WHWEXT L"hw.dll"
 #else
-#define HWEXT L"hw.so"
+#define HWEXT "hw.so"
+#define WHWEXT L"hw.so"
 #endif
 
 #include "cl_dll.h"
