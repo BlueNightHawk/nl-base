@@ -1,9 +1,9 @@
+#ifdef WIN32
+
 #include "sptlib-stdafx.hpp"
 
 #include "MemUtils.hpp"
 #include "DetoursUtils.hpp"
-
-#ifdef WIN32
 
 namespace MemUtils
 {

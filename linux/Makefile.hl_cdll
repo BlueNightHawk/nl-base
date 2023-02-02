@@ -168,6 +168,11 @@ SPTLIB_OBJS = \
 	$(SPTLIB_OBJ_DIR)/DetoursUtils.o \
 	$(SPTLIB_OBJ_DIR)/MemUtils.o \
 	$(SPTLIB_OBJ_DIR)/MemUtils_linux.o \
+	$(SPTLIB_OBJ_DIR)/Hooks.o \
+	$(SPTLIB_OBJ_DIR)/Hooks_linux.o \
+	$(SPTLIB_OBJ_DIR)/IHookableModule.o \
+	$(SPTLIB_OBJ_DIR)/sptlib.o \
+	$(SPTLIB_OBJ_DIR)/sptlib-stdafx.o \
 
 all: client.$(SHLIBEXT)
 

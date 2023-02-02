@@ -426,6 +426,18 @@
     <ClCompile Include="..\..\SPTLib\MemUtils_win.cpp">
       <Filter>Source Files\SPTLib</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\SPTLib\Hooks.cpp">
+      <Filter>Source Files\SPTLib</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\SPTLib\sptlib.cpp">
+      <Filter>Source Files\SPTLib</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\SPTLib\sptlib-stdafx.cpp">
+      <Filter>Source Files\SPTLib</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\SPTLib\Hooks_win.cpp">
+      <Filter>Source Files\SPTLib</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\cl_dll\kbutton.h">

@@ -222,8 +222,12 @@ cmd /c ""$(ProjectDir)..\..\filecopy.bat" "$(OutDir)" "cl_dlls" "$(TargetName).p
     <ClCompile Include="..\..\pm_shared\pm_shared.cpp" />
     <ClCompile Include="..\..\public\interface.cpp" />
     <ClCompile Include="..\..\SPTLib\DetoursUtils.cpp" />
+    <ClCompile Include="..\..\SPTLib\Hooks.cpp" />
+    <ClCompile Include="..\..\SPTLib\Hooks_win.cpp" />
     <ClCompile Include="..\..\SPTLib\MemUtils.cpp" />
     <ClCompile Include="..\..\SPTLib\MemUtils_win.cpp" />
+    <ClCompile Include="..\..\SPTLib\sptlib-stdafx.cpp" />
+    <ClCompile Include="..\..\SPTLib\sptlib.cpp" />
     <ClCompile Include="..\..\subhook\subhook.c" />
   </ItemGroup>
   <ItemGroup>
