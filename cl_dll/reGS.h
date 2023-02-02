@@ -25,3 +25,9 @@
 void VGuiWrap2_Hook();
 void R_Hook();
 void GLDraw_Hook();
+
+void VGuiWrap2_UnHook();
+void R_UnHook();
+void GLDraw_UnHook();
+
+void ShutdownHooks();

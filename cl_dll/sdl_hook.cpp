@@ -48,3 +48,8 @@ void HookSdl()
 
 	SwapWindowHook.Install((void*)pSDL_GL_SwapWindow, (void*)&HOOKED_SDL_GL_SwapWindow);
 }
+
+void UnHookSdl()
+{
+	SwapWindowHook.Remove();
+}

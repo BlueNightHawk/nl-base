@@ -187,7 +187,7 @@ SOLOUD_OBJS = \
 	$(SOLOUD_OBJ_DIR)/dr_impl.o \
 	$(SOLOUD_OBJ_DIR)/soloud_wav.o \
 	$(SOLOUD_OBJ_DIR)/soloud_wavstream.o \
-	$(SOLOUD_OBJ_DIR)/std_vorbis.o \
+	$(SOLOUD_OBJ_DIR)/stb_vorbis.o \
 	$(SOLOUD_OBJ_DIR)/soloud.o \
 	$(SOLOUD_OBJ_DIR)/soloud_audiosource.o \
 	$(SOLOUD_OBJ_DIR)/soloud_bus.o \

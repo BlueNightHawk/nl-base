@@ -421,3 +421,15 @@ void GLDraw_Hook()
 	Hook(GL_ResampleTexture, GL_ResampleTextureHook);
 	Hook(GL_ResampleAlphaTexture, GL_ResampleAlphaTextureHook);
 }
+
+void GLDraw_UnHook()
+{
+	BuildGammaTableHook.Remove();
+	BoxFilter3x3Hook.Remove();
+	GL_Upload32Hook.Remove();
+	GL_Upload16Hook.Remove();
+	VideoMode_GetCurrentVideoModeHook.Remove();
+	ComputeScaledSizeHook.Remove();
+	GL_ResampleTextureHook.Remove();
+	GL_ResampleAlphaTextureHook.Remove();
+}

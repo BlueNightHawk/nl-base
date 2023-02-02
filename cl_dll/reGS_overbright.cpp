@@ -55,3 +55,8 @@ void R_Hook()
 	else
 		gEngfuncs.Con_DPrintf("[%s] Could not find R_BuildLightMap.\n", HWEXT);
 }
+
+void R_UnHook()
+{
+	R_BuildLightMapHook.Remove();
+}

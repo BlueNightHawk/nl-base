@@ -17,3 +17,8 @@ void VGuiWrap2_Hook()
 {
 	Hook(VGuiWrap2_NotifyOfServerConnect, VguiWrapHook);
 }
+
+void VGuiWrap2_UnHook()
+{
+	VguiWrapHook.Remove();
+}

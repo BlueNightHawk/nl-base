@@ -40,3 +40,10 @@ void InitGameUI()
 		staticGameUIFuncs = static_cast<IGameUI*>(gameUIFactory(GAMEUI_INTERFACE_VERSION, nullptr));
 	}
 }
+
+void ShutdownGameUI()
+{
+	Sys_UnloadModule(m_hStaticGameUIModule);
+	m_hStaticGameUIModule = nullptr;
+	staticGameUIFuncs = nullptr;
+}

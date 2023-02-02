@@ -18,6 +18,14 @@ bool HWHook()
 
 	VGuiWrap2_Hook();
 	R_Hook();
+	GLDraw_Hook();
 
 	return true;
+}
+
+void ShutdownHooks()
+{
+	VGuiWrap2_UnHook();
+	R_UnHook();
+	GLDraw_UnHook();
 }

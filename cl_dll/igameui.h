@@ -149,6 +149,7 @@ public:
 #define GAMEUI_INTERFACE_VERSION "GameUI007"
 
 void InitGameUI();
+void ShutdownGameUI();
 
 extern IGameUI* staticGameUIFuncs;
 

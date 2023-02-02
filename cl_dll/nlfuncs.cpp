@@ -7,14 +7,16 @@
 #include "reGS.h"
 
 void HookSdl();
+void UnHookSdl();
+
+void ShutdownImgui();
 
 void NL_Init()
 {
+	InitGameUI();
 	HookSdl();
 	InitDiscord();
-	InitGameUI();
 	HWHook();
-	GLDraw_Hook();
 
 #ifdef WIN32
 	Hooks::Init(false);
@@ -24,4 +26,12 @@ void NL_Init()
 void NL_Update()
 {
 	UpdatePresence();
+}
+
+void NL_Shutdown()
+{
+	ShutdownImgui();
+	ShutdownHooks();
+	UnHookSdl();
+	ShutdownGameUI();
 }

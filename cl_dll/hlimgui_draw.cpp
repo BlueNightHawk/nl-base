@@ -15,12 +15,16 @@ static bool g_bImGuiInit = false;
 
 int ProcessEvent(void* userdata, SDL_Event* event)
 {
-	return ImGui_ImplSDL2_ProcessEvent(event);
+	return static_cast<int>(ImGui_ImplSDL2_ProcessEvent(event));
 }
+
+static int iActiveKey = 0;
 
 bool CanShowMenu()
 {
-	static int iActiveKey = 0;
+	if (!staticGameUIFuncs)
+		return true;
+
 	if (iActiveKey == 0)
 		iActiveKey = staticGameUIFuncs->IsGameUIActive();
 
@@ -30,6 +34,8 @@ bool CanShowMenu()
 void InitImgui()
 {
 	assert(window != nullptr);
+
+	iActiveKey = 0;
 
 	// Setup Dear ImGui context
 	IMGUI_CHECKVERSION();
@@ -53,6 +59,9 @@ void InitImgui()
 
 void DrawImgui()
 {
+	if (window == nullptr)
+		return;
+
 	if (!g_bImGuiInit)
 		InitImgui();
 
@@ -71,4 +80,17 @@ void DrawImgui()
 	ImGui::Render();
     glViewport(0, 0, (int)io.DisplaySize.x, (int)io.DisplaySize.y);
 	ImGui_ImplOpenGL2_RenderDrawData(ImGui::GetDrawData());
+}
+
+void ShutdownImgui()
+{
+	// Cleanup
+	ImGui_ImplOpenGL2_Shutdown();
+	ImGui_ImplSDL2_Shutdown();
+	ImGui::DestroyContext();
+
+	SDL_DelEventWatch(&ProcessEvent, nullptr);
+
+	g_bImGuiInit = false;
+	window = nullptr;
 }

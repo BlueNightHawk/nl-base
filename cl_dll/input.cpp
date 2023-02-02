@@ -21,6 +21,8 @@
 #include "vgui_TeamFortressViewport.h"
 #include "filesystem_utils.h"
 
+#include "nlfuncs.h"
+
 
 extern bool g_iAlive;
 
@@ -1023,4 +1025,6 @@ void DLLEXPORT HUD_Shutdown()
 
 	FileSystem_FreeFileSystem();
 	CL_UnloadParticleMan();
+
+	NL_Shutdown();
 }
