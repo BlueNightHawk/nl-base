@@ -262,7 +262,6 @@ PATTERNS(R_BuildLightMap,
 PATTERNS(R_BuildLightMap,
 	"HL-SteamPipe-8684",
 	"55 57 56 53 83 EC ?? 8B 84 24 ?? ?? ?? ?? D9");
-);
 #endif
 
 PATTERNS(R_Clear,
