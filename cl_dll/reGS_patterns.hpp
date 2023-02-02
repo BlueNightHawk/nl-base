@@ -42,7 +42,7 @@ PATTERNS(BuildGammaTable,
 #else
 PATTERNS(BuildGammaTable,
 	"HL-SteamPipe-8684",
-	"56 53 83 EC ? ? D9 44");
+	"56 53 83 EC ?? D9 44");
 #endif
 PATTERNS(BUsesSDLInput,
 	"HL-SteamPipe-8684",
