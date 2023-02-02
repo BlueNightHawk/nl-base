@@ -14,6 +14,7 @@ void NL_Init()
 	InitDiscord();
 	InitGameUI();
 	HWHook();
+	Hooks::Init(false);
 }
 
 void NL_Update()
