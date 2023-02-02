@@ -14,7 +14,10 @@ void NL_Init()
 	InitDiscord();
 	InitGameUI();
 	HWHook();
+
+#ifdef WIN32
 	Hooks::Init(false);
+#endif
 }
 
 void NL_Update()

@@ -8,12 +8,6 @@
 #include "sptlib.hpp"
 #include "MemUtils.hpp"
 
-typedef void* (*_dlopen)(const char* filename, int flag);
-typedef int (*_dlclose)(void* handle);
-
-extern _dlopen ORIG_dlopen;
-extern _dlclose ORIG_dlclose;
-
 namespace MemUtils
 {
 	namespace detail
@@ -127,8 +121,8 @@ namespace MemUtils
 		dl_iterate_phdr([](dl_phdr_info* i, size_t s, void* data) -> int {
 			if (i->dlpi_name[0])
 			{
-				auto handle = ORIG_dlopen(i->dlpi_name, RTLD_LAZY | RTLD_NOLOAD);
-				ORIG_dlclose(handle);
+				auto handle = dlopen(i->dlpi_name, RTLD_LAZY | RTLD_NOLOAD);
+				dlclose(handle);
 
 				auto p = reinterpret_cast<std::pair<void*, const std::wstring*>*>(data);
 				if (!p->second->compare(GetFileName(Convert(std::string(i->dlpi_name)))))
@@ -155,8 +149,8 @@ namespace MemUtils
 		dl_iterate_phdr([](dl_phdr_info* i, size_t s, void* data) -> int {
 			if (i->dlpi_name[0])
 			{
-				auto handle = ORIG_dlopen(i->dlpi_name, RTLD_LAZY | RTLD_NOLOAD);
-				ORIG_dlclose(handle);
+				auto handle = dlopen(i->dlpi_name, RTLD_LAZY | RTLD_NOLOAD);
+				dlclose(handle);
 
 				auto p = reinterpret_cast<std::pair<void*, std::string>*>(data);
 				if (handle == p->first)
@@ -176,8 +170,8 @@ namespace MemUtils
 		dl_iterate_phdr([](dl_phdr_info* i, size_t s, void* data) -> int {
 			if (i->dlpi_name[0])
 			{
-				auto handle = ORIG_dlopen(i->dlpi_name, RTLD_LAZY | RTLD_NOLOAD);
-				ORIG_dlclose(handle);
+				auto handle = dlopen(i->dlpi_name, RTLD_LAZY | RTLD_NOLOAD);
+				dlclose(handle);
 				reinterpret_cast<std::vector<void*>*>(data)->push_back(handle);
 			}
 
