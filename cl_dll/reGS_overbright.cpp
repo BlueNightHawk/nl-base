@@ -38,10 +38,10 @@ void R_Hook()
 
 	if (ORIG_R_BuildLightMap)
 	{
-		gEngfuncs.Con_DPrintf("[hw dll] Found R_BuildLightMap at %p (using the %s pattern).\n", ORIG_R_BuildLightMap, pattern->name());
+		gEngfuncs.Con_DPrintf("[%s] Found R_BuildLightMap at %p (using the %s pattern).\n", HWEXT, ORIG_R_BuildLightMap, pattern->name());
 		void* pR_BuildLightMap = (void*)ORIG_R_BuildLightMap;
 		R_BuildLightMapHook.Install(pR_BuildLightMap, (void*)R_BuildLightMap);
 	}
 	else
-		gEngfuncs.Con_DPrintf("[hw dll] Could not find R_BuildLightMap.\n");
+		gEngfuncs.Con_DPrintf("[%s] Could not find R_BuildLightMap.\n", HWEXT);
 }

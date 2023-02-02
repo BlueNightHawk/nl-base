@@ -3,12 +3,6 @@
 
 #include "reGS.h"
 
-#ifdef WIN32
-#define HWEXT L"hw.dll"
-#else
-#define HWEXT L"hw.so"
-#endif
-
 Utils utils = Utils::Utils(NULL, NULL, NULL);
 
 bool HWHook()

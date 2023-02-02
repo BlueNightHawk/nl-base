@@ -1,5 +1,11 @@
 #pragma once
 
+#ifdef WIN32
+#define HWEXT L"hw.dll"
+#else
+#define HWEXT L"hw.so"
+#endif
+
 #include "cl_dll.h"
 #include "cdll_int.h"
 #include "studio.h"
@@ -13,7 +19,6 @@
 #include "Hooks.hpp"
 #include "reGS_enginehook.h"
 
-extern Utils utils;
 
 void VGuiWrap2_Hook();
 void R_Hook();

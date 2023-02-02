@@ -10,7 +10,7 @@
 
 bool HWHook();
 
-inline std::vector<subhook::Hook> g_Hooks;
+extern Utils utils;
 
 #define Find(future_name)                                                                                                                  \
 	{                                                                                                                                      \
@@ -29,13 +29,13 @@ inline std::vector<subhook::Hook> g_Hooks;
 		auto pattern = f##future_name.get();                                                                                               \
 		if (ORIG_##future_name)                                                                                                            \
 		{                                                                                                                                  \
-			gEngfuncs.Con_DPrintf("[hw dll] Found " #future_name " at %p (using the %s pattern).\n", ORIG_##future_name, pattern->name()); \
+			gEngfuncs.Con_DPrintf("[%s] Found " #future_name " at %p (using the %s pattern).\n", HWEXT, ORIG_##future_name, pattern->name()); \
 			void* p##future_name = (void*)ORIG_##future_name;                                                                              \
 			hook.Install(p##future_name, (void*)future_name);                                              \
 		}                                                                                                                                  \
 		else                                                                                                                               \
 		{                                                                                                                                  \
-			gEngfuncs.Con_DPrintf("[hw dll] Could not find " #future_name ".\n");                                                          \
+			gEngfuncs.Con_DPrintf("[%s] Could not find " #future_name ".\n", HWEXT);                                                          \
 		}                                                                                                                                  \
 	}
 
