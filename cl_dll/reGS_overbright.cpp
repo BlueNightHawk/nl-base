@@ -1,15 +1,14 @@
 #include "reGS.h"
 
 typedef void (*_R_BuildLightMap)(msurface_t* psurf, uint8_t* dest, int stride);
-typedef void (*_R_BlendLightmaps)();
+typedef void (*_DrawTextureChains)();
 
 _R_BuildLightMap ORIG_R_BuildLightMap = NULL;
-_R_BlendLightmaps ORIG_R_BlendLightmaps = NULL;
+_DrawTextureChains ORIG_DrawTextureChains = NULL;
 
 qboolean* gl_texsort;
 
 subhook::Hook R_BuildLightMapHook;
-subhook::Hook R_BlendLightMapsHook;
 
 void R_BuildLightMap(msurface_t* psurf, uint8_t* dest, int stride)
 {
@@ -40,16 +39,16 @@ void R_Hook()
 		});
 
 	#ifndef WIN32
-	auto fR_BlendLightMaps = utils.FindAsync(
-		ORIG_R_BlendLightMaps,
-		patterns::engine::R_BlendLightMaps,
+	auto fR_DrawTextureChains = utils.FindAsync(
+		ORIG_DrawTextureChains,
+		patterns::engine::DrawTextureChains,
 		[&](auto pattern)
 		{
-			switch (pattern - patterns::engine::R_BlendLightMaps.cbegin())
+			switch (pattern - patterns::engine::DrawTextureChains.cbegin())
 			{
 			default:
 			case 0: // HL-SteamPipe-8684
-				gl_texsort = *reinterpret_cast<qboolean**>(reinterpret_cast<uintptr_t>(ORIG_R_BlendLightMaps) + 19);
+				gl_texsort = *reinterpret_cast<qboolean**>(reinterpret_cast<uintptr_t>(ORIG_DrawTextureChains) + 11);
 				break;
 			}
 		});
