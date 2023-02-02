@@ -11,9 +11,6 @@ IMGUI_SRC_DIR=$(SOURCE_DIR)/imgui
 IMGUI_BACKEND_SRC_DIR=$(SOURCE_DIR)/imgui/backends
 DISCORD_SRC_DIR=$(SOURCE_DIR)/discord-rpc/src
 SPTLIB_SRC_DIR=$(SOURCE_DIR)/SPTLib
-SOLOUD_SRC_DIR=$(SOURCE_DIR)/soloud/src/core
-SOLOUD_BACKEND_SRC_DIR=$(SOURCE_DIR)/soloud/src/backend/sdl
-SOLOUD_AUDIO_SRC_DIR=$(SOURCE_DIR)/soloud/src/audiosource/wav
 
 HL1_OBJ_DIR=$(BUILD_OBJ_DIR)/hl1_client
 HL1_PARTICLEMAN_OBJ_DIR=$(BUILD_OBJ_DIR)/particleman
@@ -27,11 +24,10 @@ IMGUI_OBJ_DIR=$(HL1_OBJ_DIR)/imgui
 IMGUI_BACKEND_OBJ_DIR=$(HL1_OBJ_DIR)/imgui/backends
 DISCORD_OBJ_DIR=$(HL1_OBJ_DIR)/discord-rpc/src
 SPTLIB_OBJ_DIR=$(HL1_OBJ_DIR)/SPTLib
-SOLOUD_OBJ_DIR=$(HL1_OBJ_DIR)/soloud
 
 CFLAGS=$(BASE_CFLAGS) $(ARCH_CFLAGS) -DCLIENT_DLL -DWITH_SDL2
 
-INCLUDEDIRS=-I$(HL_SRC_DIR) -I$(HL_PARTICLEMAN_DIR) -I../dlls -I/usr/include/malloc -I$(COMMON_SRC_DIR) -I$(PUBLIC_SRC_DIR) -I../pm_shared -I../engine -I../utils/vgui/include -I../game_shared -I../external -I../external/SDL2 -I../imgui -I../discord-rpc/include -I../rapidjson/include -I../SPTLib -I../soloud/include 
+INCLUDEDIRS=-I$(HL_SRC_DIR) -I$(HL_PARTICLEMAN_DIR) -I../dlls -I/usr/include/malloc -I$(COMMON_SRC_DIR) -I$(PUBLIC_SRC_DIR) -I../pm_shared -I../engine -I../utils/vgui/include -I../game_shared -I../external -I../external/SDL2 -I../imgui -I../discord-rpc/include -I../rapidjson/include -I../SPTLib
 
 LDFLAGS=$(SHLIBLDFLAGS) $(CPP_LIB) -L$(CFG) vgui.so -L. libSDL2-2.0.so.0 -L libGL.so
 
@@ -181,37 +177,10 @@ SPTLIB_OBJS = \
 	$(SPTLIB_OBJ_DIR)/sptlib.o \
 	$(SPTLIB_OBJ_DIR)/sptlib-stdafx.o \
 
-SOLOUD_OBJS = \
-	$(SOLOUD_OBJ_DIR)/soloud_sdl2.o \
-	$(SOLOUD_OBJ_DIR)/soloud_sdl2_dll.o \
-	$(SOLOUD_OBJ_DIR)/dr_impl.o \
-	$(SOLOUD_OBJ_DIR)/soloud_wav.o \
-	$(SOLOUD_OBJ_DIR)/soloud_wavstream.o \
-	$(SOLOUD_OBJ_DIR)/stb_vorbis.o \
-	$(SOLOUD_OBJ_DIR)/soloud.o \
-	$(SOLOUD_OBJ_DIR)/soloud_audiosource.o \
-	$(SOLOUD_OBJ_DIR)/soloud_bus.o \
-	$(SOLOUD_OBJ_DIR)/soloud_core_3d.o \
-	$(SOLOUD_OBJ_DIR)/soloud_core_basicops.o \
-	$(SOLOUD_OBJ_DIR)/soloud_core_faderops.o \
-	$(SOLOUD_OBJ_DIR)/soloud_core_filterops.o \
-	$(SOLOUD_OBJ_DIR)/soloud_core_getters.o \
-	$(SOLOUD_OBJ_DIR)/soloud_core_setters.o \
-	$(SOLOUD_OBJ_DIR)/soloud_core_voicegroup.o \
-	$(SOLOUD_OBJ_DIR)/soloud_core_voiceops.o \
-	$(SOLOUD_OBJ_DIR)/soloud_fader.o \
-	$(SOLOUD_OBJ_DIR)/soloud_fft.o \
-	$(SOLOUD_OBJ_DIR)/soloud_fft_lut.o \
-	$(SOLOUD_OBJ_DIR)/soloud_file.o \
-	$(SOLOUD_OBJ_DIR)/soloud_filter.o \
-	$(SOLOUD_OBJ_DIR)/soloud_misc.o \
-	$(SOLOUD_OBJ_DIR)/soloud_queue.o \
-	$(SOLOUD_OBJ_DIR)/soloud_thread.o \
-
 all: client.$(SHLIBEXT)
 
-client.$(SHLIBEXT): $(HL1_OBJS) $(PUBLIC_OBJS) $(COMMON_OBJS) $(GAME_SHARED_OBJS) $(DLL_OBJS) $(PM_SHARED_OBJS) $(SUBHOOK_OBJS) $(IMGUI_OBJS) $(IMGUI_BACKEND_OBJS) $(DISCORD_OBJS) $(SPTLIB_OBJS) $(SOLOUD_OBJS) $(HL1_PARTICLEMAN_OBJS)
-	$(CPLUS) -o $(BUILD_DIR)/$@ $(HL1_OBJS) $(PUBLIC_OBJS) $(COMMON_OBJS) $(GAME_SHARED_OBJS) $(DLL_OBJS) $(PM_SHARED_OBJS) $(SUBHOOK_OBJS) $(IMGUI_OBJS) $(IMGUI_BACKEND_OBJS) $(DISCORD_OBJS) $(SPTLIB_OBJS) $(SOLOUD_OBJS) $(HL1_PARTICLEMAN_OBJS) $(LDFLAGS) $(CPP_LIB)
+client.$(SHLIBEXT): $(HL1_OBJS) $(PUBLIC_OBJS) $(COMMON_OBJS) $(GAME_SHARED_OBJS) $(DLL_OBJS) $(PM_SHARED_OBJS) $(SUBHOOK_OBJS) $(IMGUI_OBJS) $(IMGUI_BACKEND_OBJS) $(DISCORD_OBJS) $(SPTLIB_OBJS) $(HL1_PARTICLEMAN_OBJS)
+	$(CPLUS) -o $(BUILD_DIR)/$@ $(HL1_OBJS) $(PUBLIC_OBJS) $(COMMON_OBJS) $(GAME_SHARED_OBJS) $(DLL_OBJS) $(PM_SHARED_OBJS) $(SUBHOOK_OBJS) $(IMGUI_OBJS) $(IMGUI_BACKEND_OBJS) $(DISCORD_OBJS) $(SPTLIB_OBJS) $(HL1_PARTICLEMAN_OBJS) $(LDFLAGS) $(CPP_LIB)
 	./gendbg.sh $(BUILD_DIR)/client.$(SHLIBEXT)
 
 $(HL1_OBJ_DIR):
@@ -251,9 +220,6 @@ $(DISCORD_OBJ_DIR):
 
 $(SPTLIB_OBJ_DIR):
 	mkdir -p $(SPTLIB_OBJ_DIR)
-
-$(SOLOUD_OBJ_DIR):
-	mkdir -p $(SOLOUD_OBJ_DIR)
 
 $(HL1_OBJ_DIR)/%.o: $(HL_SRC_DIR)/%.cpp $(filter-out $(wildcard  $(HL1_OBJ_DIR)),  $(HL1_OBJ_DIR))
 	$(DO_CC)
@@ -300,20 +266,6 @@ $(DISCORD_OBJ_DIR)/%.o : $(DISCORD_SRC_DIR)/%.cpp $(filter-out $(wildcard  $(DIS
 $(SPTLIB_OBJ_DIR)/%.o : $(SPTLIB_SRC_DIR)/%.cpp $(filter-out $(wildcard  $(SPTLIB_OBJ_DIR)),  $(SPTLIB_OBJ_DIR))
 	$(DO_CC)
 
-$(SOLOUD_OBJ_DIR)/%.o : $(SOLOUD_SRC_DIR)/%.cpp $(filter-out $(wildcard  $(SOLOUD_OBJ_DIR)),  $(SOLOUD_OBJ_DIR))
-	$(DO_CC)
-
-$(SOLOUD_OBJ_DIR)/%.o : $(SOLOUD_AUDIO_SRC_DIR)/%.cpp $(filter-out $(wildcard  $(SOLOUD_OBJ_DIR)),  $(SOLOUD_OBJ_DIR))
-	$(DO_CC)
-
-$(SOLOUD_OBJ_DIR)/%.o : $(SOLOUD_AUDIO_SRC_DIR)/%.c $(filter-out $(wildcard  $(SOLOUD_OBJ_DIR)),  $(SOLOUD_OBJ_DIR))
-	$(DO_CC)
-
-$(SOLOUD_OBJ_DIR)/%.o : $(SOLOUD_BACKEND_SRC_DIR)/%.cpp $(filter-out $(wildcard  $(SOLOUD_OBJ_DIR)),  $(SOLOUD_OBJ_DIR))
-	$(DO_CC)
-
-$(SOLOUD_OBJ_DIR)/%.o : $(SOLOUD_BACKEND_SRC_DIR)/%.c $(filter-out $(wildcard  $(SOLOUD_OBJ_DIR)),  $(SOLOUD_OBJ_DIR))
-	$(DO_CC)
 
 clean:
 	-rm -rf $(HL1_OBJ_DIR)

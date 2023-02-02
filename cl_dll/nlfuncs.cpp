@@ -10,6 +10,7 @@ void HookSdl();
 void UnHookSdl();
 
 void ShutdownImgui();
+void ShutdownPresence();
 
 void NL_Init()
 {
@@ -34,4 +35,5 @@ void NL_Shutdown()
 	ShutdownHooks();
 	UnHookSdl();
 	ShutdownGameUI();
+	ShutdownPresence();
 }

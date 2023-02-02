@@ -57,3 +57,8 @@ void UpdatePresence()
 
 	Discord_UpdatePresence(&discordPresence);
 }
+
+void ShutdownPresence()
+{
+	Discord_Shutdown();
+}

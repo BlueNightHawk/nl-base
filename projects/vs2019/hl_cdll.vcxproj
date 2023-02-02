@@ -71,7 +71,7 @@
     <Link>
       <SubSystem>Windows</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalDependencies>..\..\utils\vgui\lib\win32_vc6\vgui.lib;wsock32.lib;..\..\lib\public\sdl2.lib;opengl32.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>..\..\utils\vgui\lib\win32_vc6\vgui.lib;wsock32.lib;..\..\lib\public\sdl2.lib;opengl32.lib;..\..\fmod\lib\fmod_vc.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <BaseAddress>
       </BaseAddress>
     </Link>
@@ -224,32 +224,6 @@ cmd /c ""$(ProjectDir)..\..\filecopy.bat" "$(OutDir)" "cl_dlls" "$(TargetName).p
     <ClCompile Include="..\..\pm_shared\pm_math.cpp" />
     <ClCompile Include="..\..\pm_shared\pm_shared.cpp" />
     <ClCompile Include="..\..\public\interface.cpp" />
-    <ClCompile Include="..\..\soloud\src\audiosource\wav\dr_impl.cpp" />
-    <ClCompile Include="..\..\soloud\src\audiosource\wav\soloud_wav.cpp" />
-    <ClCompile Include="..\..\soloud\src\audiosource\wav\soloud_wavstream.cpp" />
-    <ClCompile Include="..\..\soloud\src\audiosource\wav\stb_vorbis.c" />
-    <ClCompile Include="..\..\soloud\src\backend\coreaudio\soloud_coreaudio.cpp" />
-    <ClCompile Include="..\..\soloud\src\backend\sdl\soloud_sdl2.cpp" />
-    <ClCompile Include="..\..\soloud\src\backend\sdl\soloud_sdl2_dll.c" />
-    <ClCompile Include="..\..\soloud\src\core\soloud.cpp" />
-    <ClCompile Include="..\..\soloud\src\core\soloud_audiosource.cpp" />
-    <ClCompile Include="..\..\soloud\src\core\soloud_bus.cpp" />
-    <ClCompile Include="..\..\soloud\src\core\soloud_core_3d.cpp" />
-    <ClCompile Include="..\..\soloud\src\core\soloud_core_basicops.cpp" />
-    <ClCompile Include="..\..\soloud\src\core\soloud_core_faderops.cpp" />
-    <ClCompile Include="..\..\soloud\src\core\soloud_core_filterops.cpp" />
-    <ClCompile Include="..\..\soloud\src\core\soloud_core_getters.cpp" />
-    <ClCompile Include="..\..\soloud\src\core\soloud_core_setters.cpp" />
-    <ClCompile Include="..\..\soloud\src\core\soloud_core_voicegroup.cpp" />
-    <ClCompile Include="..\..\soloud\src\core\soloud_core_voiceops.cpp" />
-    <ClCompile Include="..\..\soloud\src\core\soloud_fader.cpp" />
-    <ClCompile Include="..\..\soloud\src\core\soloud_fft.cpp" />
-    <ClCompile Include="..\..\soloud\src\core\soloud_fft_lut.cpp" />
-    <ClCompile Include="..\..\soloud\src\core\soloud_file.cpp" />
-    <ClCompile Include="..\..\soloud\src\core\soloud_filter.cpp" />
-    <ClCompile Include="..\..\soloud\src\core\soloud_misc.cpp" />
-    <ClCompile Include="..\..\soloud\src\core\soloud_queue.cpp" />
-    <ClCompile Include="..\..\soloud\src\core\soloud_thread.cpp" />
     <ClCompile Include="..\..\SPTLib\DetoursUtils.cpp" />
     <ClCompile Include="..\..\SPTLib\Hooks.cpp" />
     <ClCompile Include="..\..\SPTLib\Hooks_win.cpp" />
