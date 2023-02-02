@@ -23,7 +23,6 @@ namespace Hooks
 
 	void Init(bool needToIntercept)
 	{
-		_EngineDevMsg("SPTLib version " SPTLIB_VERSION ".\n");
 		EngineDevMsg("Modules contain %d entries.\n", modules.size());
 
 		InitInterception(needToIntercept);
