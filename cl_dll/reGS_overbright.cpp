@@ -24,23 +24,6 @@ void R_BuildLightMap(msurface_t* psurf, uint8_t* dest, int stride)
 
 void R_Hook()
 {
-#ifndef WIN32
-	auto fR_DrawTextureChains = utils.FindAsync(
-		ORIG_DrawTextureChains,
-		patterns::engine::DrawTextureChains,
-		[&](auto pattern)
-		{
-			switch (pattern - patterns::engine::DrawTextureChains.cbegin())
-			{
-			default:
-			case 0: // HL-SteamPipe-8684
-				gl_texsort = *reinterpret_cast<qboolean**>(reinterpret_cast<uintptr_t>(ORIG_DrawTextureChains) + 11);
-				break;
-			}
-		});
-
-	Hook(R_BuildLightMap, R_BuildLightMapHook);
-#else
 	auto fR_BuildLightMap = utils.FindAsync(
 		ORIG_R_BuildLightMap,
 		patterns::engine::R_BuildLightMap,
@@ -55,6 +38,10 @@ void R_Hook()
 			}
 		});
 
+#ifndef WIN32
+	gl_texsort = (qboolean*)PL_GetProcAddress(utils.GetBase(), "gl_texsort");
+#endif
+
 	auto pattern = fR_BuildLightMap.get();
 
 	if (ORIG_R_BuildLightMap)
@@ -65,5 +52,4 @@ void R_Hook()
 	}
 	else
 		gEngfuncs.Con_DPrintf("[%s] Could not find R_BuildLightMap.\n", HWEXT);
-#endif
 }

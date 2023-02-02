@@ -84,6 +84,11 @@ typedef struct Utils
 			onFound);
 	}
 
+	void* GetBase()
+	{
+		return m_Base;
+	}
+
 protected:
 	void* m_Handle;
 	void* m_Base;
