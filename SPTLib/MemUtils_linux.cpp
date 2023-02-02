@@ -120,17 +120,17 @@ namespace MemUtils
 		return true;
 	}
 
-	bool GetModuleInfo(const std::wstring& moduleName, void** moduleHandle, void** moduleBase, size_t* moduleSize)
+	bool GetModuleInfo(const std::string& moduleName, void** moduleHandle, void** moduleBase, size_t* moduleSize)
 	{
 		auto fileName = GetFileName(moduleName);
-		std::pair<void*, const std::wstring*> p = { nullptr, &fileName };
+		std::pair<void*, const std::string*> p = { nullptr, &fileName };
 		dl_iterate_phdr([](dl_phdr_info* i, size_t s, void* data) -> int {
 			if (i->dlpi_name[0])
 			{
 				auto handle = ORIG_dlopen(i->dlpi_name, RTLD_LAZY | RTLD_NOLOAD);
 				ORIG_dlclose(handle);
 
-				auto p = reinterpret_cast<std::pair<void*, const std::wstring*>*>(data);
+				auto p = reinterpret_cast<std::pair<void*, const std::string*>*>(data);
 				if (!p->second->compare(GetFileName(Convert(std::string(i->dlpi_name)))))
 					p->first = handle;
 			}
