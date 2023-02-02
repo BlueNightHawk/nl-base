@@ -1,1 +1,0 @@
-#include "sptlib-stdafx.hpp"

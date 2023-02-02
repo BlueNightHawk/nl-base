@@ -165,7 +165,7 @@ DISCORD_OBJS = \
 	$(DISCORD_OBJ_DIR)/serialization.o \
 
 SPTLIB_OBJS = \
-	$(SPTLIB_OBJ_DIR)/DetourUtils.o \
+	$(SPTLIB_OBJ_DIR)/DetoursUtils.o \
 	$(SPTLIB_OBJ_DIR)/MemUtils.o \
 	$(SPTLIB_OBJ_DIR)/MemUtils_linux.o \
 

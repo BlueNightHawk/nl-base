@@ -1,12 +1,12 @@
-#include "../sptlib-stdafx.hpp"
+#include "sptlib-stdafx.hpp"
 
 #include <dlfcn.h>
 #include <link.h>
 #include <sys/mman.h>
 #include <linux/limits.h>
 #include <unistd.h>
-#include "../sptlib.hpp"
-#include "../MemUtils.hpp"
+#include "sptlib.hpp"
+#include "MemUtils.hpp"
 
 typedef void* (*_dlopen)(const char* filename, int flag);
 typedef int (*_dlclose)(void* handle);

@@ -1,8 +1,7 @@
-#include "../sptlib-stdafx.hpp"
+#include "sptlib-stdafx.hpp"
 
-#include "../sptlib.hpp"
+#include "sptlib.hpp"
 #include "DetoursUtils.hpp"
-#include "../subhook/subhook.h"
 
 namespace DetoursUtils
 {

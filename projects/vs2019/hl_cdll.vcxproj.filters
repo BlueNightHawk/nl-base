@@ -417,13 +417,13 @@
     <ClCompile Include="..\..\cl_dll\reGS_enginehook.cpp">
       <Filter>Source Files\nl\reGS</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\SPTLib\DetoursUtils.cpp">
+      <Filter>Source Files\SPTLib</Filter>
+    </ClCompile>
     <ClCompile Include="..\..\SPTLib\MemUtils.cpp">
       <Filter>Source Files\SPTLib</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\SPTLib\Windows\MemUtils_win.cpp">
-      <Filter>Source Files\SPTLib</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\SPTLib\Windows\DetoursUtils.cpp">
+    <ClCompile Include="..\..\SPTLib\MemUtils_win.cpp">
       <Filter>Source Files\SPTLib</Filter>
     </ClCompile>
   </ItemGroup>
