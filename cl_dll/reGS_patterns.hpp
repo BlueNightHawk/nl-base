@@ -423,7 +423,12 @@ PATTERNS(VGuiWrap2_ConPrintf,
 
 PATTERNS(VGuiWrap2_NotifyOfServerConnect,
 	"HL-SteamPipe-8684",
-	"55 8B EC 8B 0D ?? ?? ?? ?? 33 C0");
+	#ifdef WIN32
+	"55 8B EC 8B 0D ?? ?? ?? ?? 33 C0"
+	#else
+	"83 EC ?? 8B 15 ?? ?? ?? ?? 85 D2 74 3F"
+	#endif
+);
 
 PATTERNS(VideoMode_GetCurrentVideoMode,
 	"HL-SteamPipe-8684",
