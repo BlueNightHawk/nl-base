@@ -1,10 +1,15 @@
 #include "reGS.h"
 
 typedef void (*_R_BuildLightMap)(msurface_t* psurf, uint8_t* dest, int stride);
+typedef void (*_R_BlendLightmaps)();
+
 _R_BuildLightMap ORIG_R_BuildLightMap = NULL;
+_R_BlendLightmaps ORIG_R_BlendLightmaps = NULL;
+
 qboolean* gl_texsort;
 
 subhook::Hook R_BuildLightMapHook;
+subhook::Hook R_BlendLightMapsHook;
 
 void R_BuildLightMap(msurface_t* psurf, uint8_t* dest, int stride)
 {
@@ -33,6 +38,22 @@ void R_Hook()
 				break;
 			}
 		});
+
+	#ifndef WIN32
+	auto fR_BlendLightMaps = utils.FindAsync(
+		ORIG_R_BlendLightMaps,
+		patterns::engine::R_BlendLightMaps,
+		[&](auto pattern)
+		{
+			switch (pattern - patterns::engine::R_BlendLightMaps.cbegin())
+			{
+			default:
+			case 0: // HL-SteamPipe-8684
+				gl_texsort = *reinterpret_cast<qboolean**>(reinterpret_cast<uintptr_t>(ORIG_R_BlendLightMaps) + 19);
+				break;
+			}
+		});
+	#endif
 
 	auto pattern = fR_BuildLightMap.get();
 
