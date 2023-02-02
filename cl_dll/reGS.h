@@ -13,7 +13,7 @@
 #include "Hooks.hpp"
 #include "reGS_enginehook.h"
 
-extern Utils utils = Utils::Utils(NULL, NULL, NULL);
+extern Utils utils;
 
 void VGuiWrap2_Hook();
 void R_Hook();

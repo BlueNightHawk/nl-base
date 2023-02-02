@@ -253,14 +253,17 @@ PATTERNS(RandomLong,
 	"HL-SteamPipe-8684",
 	"55 8B EC 53 8D 45 0C 56 8D 4D 08 50 51 FF 15 ?? ?? ?? ?? 8B 75 0C");
 
+#ifdef WIN32
 PATTERNS(R_BuildLightMap,
 	"HL-SteamPipe-8684",
-#ifdef WIN32
 	"55 8B EC 83 EC 1C D9 05 ?? ?? ?? ?? D8 1D ?? ?? ?? ?? DF E0"
-#else
-	"55 57 56 53 83 EC ?? 8B 84 24 ?? ?? ?? ?? D9"
-#endif
 );
+#else
+PATTERNS(R_BuildLightMap,
+	"HL-SteamPipe-8684",
+	"55 57 56 53 83 EC ?? 8B 84 24 ?? ?? ?? ?? D9");
+);
+#endif
 
 PATTERNS(R_Clear,
 	"HL-SteamPipe-8684",
@@ -426,15 +429,17 @@ PATTERNS(VGuiWrap2_ConPrintf,
 	"HL-SteamPipe-8684",
 	"55 8B EC A1 ?? ?? ?? ?? 85 C0 74 14 8B 55 08 8B 08 52 68 ?? ?? ?? ?? 50 FF 51 18 83 C4 0C 5D C3 53 56 8B 75 08 57 8B FE 83 C9 FF 33 C0");
 
+#ifdef WIN32
 PATTERNS(VGuiWrap2_NotifyOfServerConnect,
 	"HL-SteamPipe-8684",
-	#ifdef WIN32
 	"55 8B EC 8B 0D ?? ?? ?? ?? 33 C0"
-	#else
-	"83 EC ?? 8B 15 ?? ?? ?? ?? 85 D2 74 3F"
-	#endif
 );
-
+#else
+PATTERNS(VGuiWrap2_NotifyOfServerConnect,
+	"HL-SteamPipe-8684",
+	"83 EC ?? 8B 15 ?? ?? ?? ?? 85 D2 74 3F"
+);
+#endif
 PATTERNS(VideoMode_GetCurrentVideoMode,
 	"HL-SteamPipe-8684",
 	"55 8B EC 8B 0D ?? ?? ?? ?? 8B 01 FF 50 ?? 85 C0");

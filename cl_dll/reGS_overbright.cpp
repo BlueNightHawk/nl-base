@@ -1,15 +1,15 @@
 #include "reGS.h"
 
-typedef void (*_R_BuildLightMap)(msurface_t* psurf, unsigned __int8* dest, int stride);
+typedef void (*_R_BuildLightMap)(msurface_t* psurf, uint8_t* dest, int stride);
 _R_BuildLightMap ORIG_R_BuildLightMap = NULL;
 qboolean* gl_texsort;
 
 subhook::Hook R_BuildLightMapHook;
 
-void R_BuildLightMap(msurface_t* psurf, unsigned __int8* dest, int stride)
+void R_BuildLightMap(msurface_t* psurf, uint8_t* dest, int stride)
 {
 	// gl_overbright fix ** note: detail textures won't work after that! **
-	*gl_texsort = TRUE;
+	*gl_texsort = true;
 
 	subhook::ScopedHookRemove remove(&R_BuildLightMapHook);
 

@@ -438,6 +438,12 @@
     <ClCompile Include="..\..\SPTLib\Hooks_win.cpp">
       <Filter>Source Files\SPTLib</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\cl_dll\reGS_overbright.cpp">
+      <Filter>Source Files\nl\reGS</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\cl_dll\reGS_vguiwrap2.cpp">
+      <Filter>Source Files\nl\reGS</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\cl_dll\kbutton.h">
