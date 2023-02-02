@@ -39,7 +39,7 @@ void R_Hook()
 		});
 
 #ifndef WIN32
-	gl_texsort = (qboolean*)PL_GetProcAddress(utils.GetBase(), "gl_texsort");
+	gl_texsort = (qboolean*)PL_GetProcAddress(utils.GetHandle(), "gl_texsort");
 #endif
 
 	auto pattern = fR_BuildLightMap.get();
