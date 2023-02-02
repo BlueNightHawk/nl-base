@@ -29,6 +29,7 @@ void R_Hook()
 		patterns::engine::R_BuildLightMap,
 		[&](auto pattern)
 		{
+#ifdef WIN32
 			switch (pattern - patterns::engine::R_BuildLightMap.cbegin())
 			{
 			default:
@@ -36,6 +37,7 @@ void R_Hook()
 				gl_texsort = *reinterpret_cast<qboolean**>(reinterpret_cast<uintptr_t>(ORIG_R_BuildLightMap) + 26);
 				break;
 			}
+#endif
 		});
 
 #ifndef WIN32
