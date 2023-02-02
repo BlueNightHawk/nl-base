@@ -4,9 +4,9 @@
 #include "reGS.h"
 
 #ifdef WIN32
-#define HWEXT "hw.dll"
+#define HWEXT L"hw.dll"
 #else
-#define HWEXT "hw.so"
+#define HWEXT L"hw.so"
 #endif
 
 Utils utils = Utils::Utils(NULL, NULL, NULL);

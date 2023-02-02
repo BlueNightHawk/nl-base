@@ -6,7 +6,7 @@ namespace MemUtils
 {
 	using namespace patterns;
 
-	bool GetModuleInfo(const std::string& moduleName, void** moduleHandle, void** moduleBase, size_t* moduleSize);
+	bool GetModuleInfo(const std::wstring& moduleName, void** moduleHandle, void** moduleBase, size_t* moduleSize);
 	bool GetModuleInfo(void* moduleHandle, void** moduleBase, size_t* moduleSize);
 	std::wstring GetModulePath(void* moduleHandle);
 	std::vector<void*> GetLoadedModules();

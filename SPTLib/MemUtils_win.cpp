@@ -84,9 +84,9 @@ namespace MemUtils
 		return true;
 	}
 
-	bool GetModuleInfo(const std::string& moduleName, void** moduleHandle, void** moduleBase, size_t* moduleSize)
+	bool GetModuleInfo(const std::wstring& moduleName, void** moduleHandle, void** moduleBase, size_t* moduleSize)
 	{
-		HMODULE Handle = GetModuleHandle(moduleName.c_str());
+		HMODULE Handle = GetModuleHandleW(moduleName.c_str());
 		auto ret = GetModuleInfo(Handle, moduleBase, moduleSize);
 
 		if (ret && moduleHandle)
