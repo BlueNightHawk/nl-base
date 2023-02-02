@@ -14,6 +14,7 @@ void NL_Init()
 	InitDiscord();
 	InitGameUI();
 	HWHook();
+	GLDraw_Hook();
 
 #ifdef WIN32
 	Hooks::Init(false);

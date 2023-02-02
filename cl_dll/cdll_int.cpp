@@ -129,8 +129,6 @@ int DLLEXPORT Initialize(cl_enginefunc_t* pEnginefuncs, int iVersion)
 		return 0;
 	}
 
-	NL_Init();
-
 	// get tracker interface, if any
 	return 1;
 }
@@ -172,6 +170,8 @@ void DLLEXPORT HUD_Init()
 	InitInput();
 	gHUD.Init();
 	Scheme_Init();
+
+	NL_Init();
 }
 
 

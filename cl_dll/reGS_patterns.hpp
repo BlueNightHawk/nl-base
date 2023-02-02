@@ -25,14 +25,25 @@ PATTERNS(build_number,
 	"HL-SteamPipe-8684",
 	"55 8B EC 83 EC 08 A1 ?? ?? ?? ?? 56 33 F6 85 C0 0F 85 9B 00 00 00 53 33 DB 8B 04 9D ?? ?? ?? ?? 8B 0D ?? ?? ?? ?? 6A 03 50 51 E8");
 
+#ifdef WIN32
 PATTERNS(BoxFilter3x3,
 	"HL-SteamPipe-8684",
 	"55 8B EC 83 EC 1C 8B 45 ?? 53 56 57 8D 78 ??");
+#else
+PATTERNS(BoxFilter3x3,
+	"HL-SteamPipe-8684",
+	"55 57 56 53 83 EC ?? 8B 44 24 ?? 8B 74 24 ?? 8B 7C 24 ?? 8B 5C");
+#endif
 
+#ifdef WIN32
 PATTERNS(BuildGammaTable,
 	"HL-SteamPipe-8684",
 	"55 8B EC 83 EC 14 D9 45 ??");
-
+#else
+PATTERNS(BuildGammaTable,
+	"HL-SteamPipe-8684",
+	"56 53 83 EC ? ? D9 44");
+#endif
 PATTERNS(BUsesSDLInput,
 	"HL-SteamPipe-8684",
 	"A0 ?? ?? ?? ?? 53 84 C0 0F 85");
@@ -113,9 +124,15 @@ PATTERNS(Cmd_FindCmd,
 	"HL-SteamPipe-8684",
 	"55 8B EC 56 8B 35 ?? ?? ?? ?? 85 F6 57 74 ?? 8B 7D ?? 8B 46 ?? 50 57 E8 ?? ?? ?? ?? 83 C4 08 85 C0 74 ?? 8B 36 85 F6 75 ?? 5F 33 C0 5E 5D C3 8B C6");
 
+#ifdef WIN32
 PATTERNS(ComputeScaledSize,
 	"HL-SteamPipe-8684",
 	"55 8B EC 51 A1 ?? ?? ?? ?? 56 85 C0 74 ?? 8B 45 ??");
+#else
+PATTERNS(ComputeScaledSize,
+	"HL-SteamPipe-8684",
+	"83 3D ?? ?? ?? ?? ?? 53 8B 44 24 ?? 8B 54 24 ?? 8B 4C 24 ?? 8B 5C 24 ?? 74 16 85 C0 74 02 89 08 85 D2 74 02 89 1A 5B C3 ?? ?? ?? ?? ?? ?? ?? ?? 89 5C 24 ?? 5B E9 ?? ?? ?? ??");
+#endif
 
 PATTERNS(Cvar_DirectSet,
 	"HL-SteamPipe-8684",
@@ -161,6 +178,7 @@ PATTERNS(GL_Bind,
 	"HL-SteamPipe-8684",
 	"55 8B EC 8B 45 ?? 8B 0D ?? ?? ?? ?? 56");
 
+#ifdef WIN32
 PATTERNS(GL_ResampleTexture,
 	"HL-SteamPipe-8684",
 	"55 8B EC B8 14 20 00 00 E8 ?? ?? ?? ?? 8B 45 ??");
@@ -176,6 +194,23 @@ PATTERNS(GL_Upload32,
 PATTERNS(GL_Upload16,
 	"HL-SteamPipe-8684",
 	"55 8B EC 51 8B 45 ?? 8B 4D ?? 53");
+#else
+PATTERNS(GL_ResampleTexture,
+	"HL-SteamPipe-8684",
+	"55 57 56 53 81 EC ? ? ? ? ? ? ? ? 8B 84 24 ? ? ? ? ? ? ? ? 85 C0 7E 5E");
+
+PATTERNS(GL_ResampleAlphaTexture,
+	"HL-SteamPipe-8684",
+	"55 57 56 53 81 EC ?? ?? ?? ?? 8B 84 24 ?? ?? ?? ?? 85 C0 7E 6A");
+
+PATTERNS(GL_Upload32,
+	"HL-SteamPipe-8684",
+	"55 57 56 53 81 EC ?? ?? ?? ?? 8B 9C 24 ?? ?? ?? ?? 8D 84");
+
+PATTERNS(GL_Upload16,
+	"HL-SteamPipe-8684",
+	"55 57 56 53 83 EC ?? 8B 44 24 ?? 8B 74 24 ?? 8B 5C");
+#endif
 
 PATTERNS(Host_AutoSave_f,
 	"HL-SteamPipe-8684",
@@ -262,12 +297,6 @@ PATTERNS(R_BuildLightMap,
 PATTERNS(R_BuildLightMap,
 	"HL-SteamPipe-8684",
 	"55 57 56 53 83 EC ?? 8B 84 24 ?? ?? ?? ?? D9");
-#endif
-
-#ifndef WIN32
-PATTERNS(DrawTextureChains,
-	"HL-SteamPipe-8684",
-	"55 57 56 53 83 EC ?? A1 ?? ?? ?? ?? A3");
 #endif
 
 PATTERNS(R_Clear,
@@ -439,15 +468,18 @@ PATTERNS(VGuiWrap2_NotifyOfServerConnect,
 	"HL-SteamPipe-8684",
 	"55 8B EC 8B 0D ?? ?? ?? ?? 33 C0"
 );
+PATTERNS(VideoMode_GetCurrentVideoMode,
+	"HL-SteamPipe-8684",
+	"55 8B EC 8B 0D ?? ?? ?? ?? 8B 01 FF 50 ?? 85 C0");
 #else
 PATTERNS(VGuiWrap2_NotifyOfServerConnect,
 	"HL-SteamPipe-8684",
 	"83 EC ?? 8B 15 ?? ?? ?? ?? 85 D2 74 3F"
 );
-#endif
 PATTERNS(VideoMode_GetCurrentVideoMode,
 	"HL-SteamPipe-8684",
-	"55 8B EC 8B 0D ?? ?? ?? ?? 8B 01 FF 50 ?? 85 C0");
+	"83 EC ?? A1 ?? ?? ?? ?? 89 5C 24 ?? 8B 5C 24 ?? 89 74 24 ?? 8B");
+#endif
 }
 }
 

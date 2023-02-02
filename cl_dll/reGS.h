@@ -24,3 +24,4 @@
 
 void VGuiWrap2_Hook();
 void R_Hook();
+void GLDraw_Hook();
