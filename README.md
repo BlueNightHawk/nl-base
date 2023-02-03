@@ -7,7 +7,7 @@ Features
 
 - Discord Rich Presence
 - ImGui Implementation
-
+- [Bacontsu's Software-esque Water](https://github.com/bacontsu/halflife_animatedwater) ( r_animate_water )
 
 Fixes from [reGS_hlsdk](https://github.com/ScriptedSnark/reGS_hlsdk):
 
