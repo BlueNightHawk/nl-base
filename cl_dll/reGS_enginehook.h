@@ -18,11 +18,11 @@ extern Utils utils;
 		auto pattern = f##future_name.get();                                                                                               \
 		if (ORIG_##future_name)                                                                                                            \
 		{                                                                                                                                  \
-			gEngfuncs.Con_DPrintf("[hw dll] Found " #future_name " at %p (using the %s pattern).\n", ORIG_##future_name, pattern->name()); \
+			gEngfuncs.Con_DPrintf("[%s] Found " #future_name " at %p (using the %s pattern).\n", HWEXT, ORIG_##future_name, pattern->name()); \
 		}                                                                                                                                  \
 	}
 
-
+#ifdef WIN32
 #define Hook(future_name, hook)                                                                                                                  \
 	{                                                                                                                                      \
 		auto f##future_name = utils.FindAsync(ORIG_##future_name, patterns::engine::future_name);                                          \
@@ -38,6 +38,22 @@ extern Utils utils;
 			gEngfuncs.Con_DPrintf("[%s] Could not find " #future_name ".\n", HWEXT);                                                          \
 		}                                                                                                                                  \
 	}
+#else
+#define Hook(future_name, hook)                                                                                                               \
+	{                                                                                                                                         \
+		ORIG_##future_name = decltype(ORIG_##future_name) PL_GetProcAddress(utils.GetHandle(), #future_name);                                  \
+		if (ORIG_##future_name)                                                                                                             \
+		{                                                                                                                                     \
+			gEngfuncs.Con_DPrintf("[%s] Found " #future_name " at %p (using the %s pattern).\n", HWEXT, ORIG_##future_name, pattern->name()); \
+			void* p##future_name = (void*)ORIG_##future_name;                                                                                 \
+			hook.Install(p##future_name, (void*)future_name);                                                                                 \
+		}                                                                                                                                     \
+		else                                                                                                                                  \
+		{                                                                                                                                     \
+			gEngfuncs.Con_DPrintf("[%s] Could not find " #future_name ".\n", HWEXT);                                                          \
+		}                                                                                                                                     \
+	}
+#endif
 
 #endif //REGS_ENGINEHOOK_H_GUARD
 

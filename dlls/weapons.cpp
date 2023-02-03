@@ -1434,3 +1434,9 @@ TYPEDESCRIPTION CSatchel::m_SaveData[] =
 		DEFINE_FIELD(CSatchel, m_chargeReady, FIELD_INTEGER),
 };
 IMPLEMENT_SAVERESTORE(CSatchel, CBasePlayerWeapon);
+
+TYPEDESCRIPTION CHgun::m_SaveData[] =
+	{
+		DEFINE_FIELD(CHgun, m_flRechargeTime, FIELD_TIME),
+};
+IMPLEMENT_SAVERESTORE(CHgun, CBasePlayerWeapon);

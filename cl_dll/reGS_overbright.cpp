@@ -24,12 +24,15 @@ void R_BuildLightMap(msurface_t* psurf, uint8_t* dest, int stride)
 
 void R_Hook()
 {
+#ifndef WIN32
+	gl_texsort = (qboolean*)PL_GetProcAddress(utils.GetHandle(), "gl_texsort");
+	Hook(R_BuildLightMap, R_BuildLightMapHook);
+#else
 	auto fR_BuildLightMap = utils.FindAsync(
 		ORIG_R_BuildLightMap,
 		patterns::engine::R_BuildLightMap,
 		[&](auto pattern)
 		{
-#ifdef WIN32
 			switch (pattern - patterns::engine::R_BuildLightMap.cbegin())
 			{
 			default:
@@ -37,12 +40,7 @@ void R_Hook()
 				gl_texsort = *reinterpret_cast<qboolean**>(reinterpret_cast<uintptr_t>(ORIG_R_BuildLightMap) + 26);
 				break;
 			}
-#endif
 		});
-
-#ifndef WIN32
-	gl_texsort = (qboolean*)PL_GetProcAddress(utils.GetHandle(), "gl_texsort");
-#endif
 
 	auto pattern = fR_BuildLightMap.get();
 
@@ -54,9 +52,11 @@ void R_Hook()
 	}
 	else
 		gEngfuncs.Con_DPrintf("[%s] Could not find R_BuildLightMap.\n", HWEXT);
+#endif
 }
 
 void R_UnHook()
 {
+	gl_texsort = nullptr;
 	R_BuildLightMapHook.Remove();
 }
