@@ -6,11 +6,15 @@ subhook::Hook VguiWrapHook;
 
 void VGuiWrap2_NotifyOfServerConnect(const char* game, int IP_0, int port)
 {
+#ifdef WIN32
+	((_VGuiWrap2_NotifyOfServerConnect)(VguiWrapHook.GetTrampoline()))("valve", IP_0, port);
+#else
 	subhook::ScopedHookRemove remove(&VguiWrapHook);
 
 	ORIG_VGuiWrap2_NotifyOfServerConnect("valve", IP_0, port);
 
 	VguiWrapHook.Install();
+#endif
 }
 
 void VGuiWrap2_Hook()

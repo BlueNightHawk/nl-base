@@ -1,10 +1,8 @@
 #include "reGS.h"
 
 typedef void (*_R_BuildLightMap)(msurface_t* psurf, uint8_t* dest, int stride);
-typedef void (*_DrawTextureChains)();
 
 _R_BuildLightMap ORIG_R_BuildLightMap = NULL;
-_DrawTextureChains ORIG_DrawTextureChains = NULL;
 
 qboolean* gl_texsort;
 
@@ -15,11 +13,15 @@ void R_BuildLightMap(msurface_t* psurf, uint8_t* dest, int stride)
 	// gl_overbright fix ** note: detail textures won't work after that! **
 	*gl_texsort = true;
 
+#ifdef WIN32
+	((_R_BuildLightMap)(R_BuildLightMapHook.GetTrampoline()))(psurf, dest, stride);
+#else
 	subhook::ScopedHookRemove remove(&R_BuildLightMapHook);
 
 	ORIG_R_BuildLightMap(psurf, dest, stride);
 
 	R_BuildLightMapHook.Install();
+#endif
 }
 
 void R_Hook()

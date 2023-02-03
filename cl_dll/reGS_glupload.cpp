@@ -28,14 +28,9 @@ _GL_ResampleTexture ORIG_GL_ResampleTexture = NULL;
 _GL_ResampleAlphaTexture ORIG_GL_ResampleAlphaTexture = NULL;
 _VideoMode_GetCurrentVideoMode ORIG_VideoMode_GetCurrentVideoMode = NULL;
 
-subhook::Hook BoxFilter3x3Hook;
 subhook::Hook GL_Upload32Hook;
 subhook::Hook GL_Upload16Hook;
 subhook::Hook BuildGammaTableHook;
-subhook::Hook ComputeScaledSizeHook;
-subhook::Hook GL_ResampleTextureHook;
-subhook::Hook GL_ResampleAlphaTextureHook;
-subhook::Hook VideoMode_GetCurrentVideoModeHook;
 
 cvar_t *brightness, *texgamma;
 cvar_t* gl_dither;
@@ -47,16 +42,12 @@ byte texgammatable[256];
 
 void VideoMode_GetCurrentVideoMode(int* wide, int* tall, int* bpp)
 {
-	subhook::ScopedHookRemove remove(&VideoMode_GetCurrentVideoModeHook);
 	ORIG_VideoMode_GetCurrentVideoMode(wide, tall, bpp);
-	VideoMode_GetCurrentVideoModeHook.Install();
 }
 
 void ComputeScaledSize(int* wscale, int* hscale, int width, int height)
 {
-	subhook::ScopedHookRemove remove(&ComputeScaledSizeHook);
 	ORIG_ComputeScaledSize(wscale, hscale, width, height);
-	ComputeScaledSizeHook.Install();
 }
 
 void BuildGammaTable(float g)
@@ -94,32 +85,28 @@ void BuildGammaTable(float g)
 	// ...
 	// Further code is for other gamma tables. Not necessary for GL_Upload32/16.
 	g = original_g;
+#ifdef WIN32
+	((_BuildGammaTable)(BuildGammaTableHook.GetTrampoline()))(g);
+#else
 	subhook::ScopedHookRemove remove(&BuildGammaTableHook);
 	ORIG_BuildGammaTable(g);
 	BuildGammaTableHook.Install();
+#endif
 }
 
 void BoxFilter3x3(byte* out, byte* in, int w, int h, int x, int y)
 {
-	subhook::ScopedHookRemove remove(&BoxFilter3x3Hook);
-
 	ORIG_BoxFilter3x3(out, in, w, h, x, y); // TODO: implement
-
-	BoxFilter3x3Hook.Install();
 }
 
 void GL_ResampleTexture(unsigned int* in, int inwidth, int inheight, unsigned int* out, int outwidth, int outheight)
 {
-	subhook::ScopedHookRemove remove(&GL_ResampleTextureHook);
 	ORIG_GL_ResampleTexture(in, inwidth, inheight, out, outwidth, outheight);
-	GL_ResampleTextureHook.Install();
 }
 
 void GL_ResampleAlphaTexture(byte* in, int inwidth, int inheight, byte* out, int outwidth, int outheight)
 {
-	subhook::ScopedHookRemove remove(&GL_ResampleAlphaTextureHook);
 	ORIG_GL_ResampleAlphaTexture(in, inwidth, inheight, out, outwidth, outheight);
-	GL_ResampleAlphaTextureHook.Install();
 }
 
 void GL_MipMap(byte* in, int width, int height)
@@ -413,23 +400,18 @@ void GLDraw_Hook()
 	gl_ansio = gEngfuncs.pfnGetCvarPointer("gl_ansio");
 
 	Hook(BuildGammaTable, BuildGammaTableHook);
-	Hook(BoxFilter3x3, BoxFilter3x3Hook);
 	Hook(GL_Upload32, GL_Upload32Hook);
 	Hook(GL_Upload16, GL_Upload16Hook);
-	Hook(VideoMode_GetCurrentVideoMode, VideoMode_GetCurrentVideoModeHook);
-	Hook(ComputeScaledSize, ComputeScaledSizeHook);
-	Hook(GL_ResampleTexture, GL_ResampleTextureHook);
-	Hook(GL_ResampleAlphaTexture, GL_ResampleAlphaTextureHook);
+	Find(BoxFilter3x3);
+	Find(GL_ResampleTexture);
+	Find(GL_ResampleAlphaTexture);
+	Find(VideoMode_GetCurrentVideoMode);
+	Find(ComputeScaledSize);
 }
 
 void GLDraw_UnHook()
 {
 	BuildGammaTableHook.Remove();
-	BoxFilter3x3Hook.Remove();
 	GL_Upload32Hook.Remove();
 	GL_Upload16Hook.Remove();
-	VideoMode_GetCurrentVideoModeHook.Remove();
-	ComputeScaledSizeHook.Remove();
-	GL_ResampleTextureHook.Remove();
-	GL_ResampleAlphaTextureHook.Remove();
 }

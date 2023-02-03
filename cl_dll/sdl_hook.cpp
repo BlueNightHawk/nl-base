@@ -25,11 +25,15 @@ void SDLCALL HOOKED_SDL_GL_SwapWindow(SDL_Window* window)
 	::window = window;
 	DrawImgui();
 
+#ifdef WIN32
+	((pfnSDL_GL_SwapWindow)(SwapWindowHook.GetTrampoline()))(window);
+#else
 	subhook::ScopedHookRemove remove(&SwapWindowHook);
 
 	pSDL_GL_SwapWindow(window);
 
 	SwapWindowHook.Install((void*)pSDL_GL_SwapWindow, (void*)&HOOKED_SDL_GL_SwapWindow);
+#endif
 }
 
 void* GetSwapWindowPtr()

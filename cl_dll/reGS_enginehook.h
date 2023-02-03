@@ -12,17 +12,17 @@ bool HWHook();
 
 extern Utils utils;
 
-#define Find(future_name)                                                                                                                  \
-	{                                                                                                                                      \
-		auto f##future_name = utils.FindAsync(ORIG_##future_name, patterns::engine::future_name);                                          \
-		auto pattern = f##future_name.get();                                                                                               \
-		if (ORIG_##future_name)                                                                                                            \
-		{                                                                                                                                  \
+#ifdef WIN32
+#define Find(future_name)                                                                                                                     \
+	{                                                                                                                                         \
+		auto f##future_name = utils.FindAsync(ORIG_##future_name, patterns::engine::future_name);                                             \
+		auto pattern = f##future_name.get();                                                                                                  \
+		if (ORIG_##future_name)                                                                                                               \
+		{                                                                                                                                     \
 			gEngfuncs.Con_DPrintf("[%s] Found " #future_name " at %p (using the %s pattern).\n", HWEXT, ORIG_##future_name, pattern->name()); \
-		}                                                                                                                                  \
+		}                                                                                                                                     \
 	}
 
-#ifdef WIN32
 #define Hook(future_name, hook)                                                                                                                  \
 	{                                                                                                                                      \
 		auto f##future_name = utils.FindAsync(ORIG_##future_name, patterns::engine::future_name);                                          \
@@ -39,6 +39,15 @@ extern Utils utils;
 		}                                                                                                                                  \
 	}
 #else
+#define Find(future_name)                                                                                                                     \
+	{                                                                                                                                         \
+		ORIG_##future_name = decltype(ORIG_##future_name)(PL_GetProcAddress(utils.GetHandle(), #future_name));                                             \                                                                                                  \
+		if (ORIG_##future_name)                                                                                                               \
+		{                                                                                                                                     \
+			gEngfuncs.Con_DPrintf("[%s] Found " #future_name " at %p (using the %s pattern).\n", HWEXT, ORIG_##future_name); \
+		}                                                                                                                                     \
+	}
+
 #define Hook(future_name, hook)                                                                                                               \
 	{                                                                                                                                         \
 		ORIG_##future_name = decltype(ORIG_##future_name)(PL_GetProcAddress(utils.GetHandle(), #future_name));                                  \
