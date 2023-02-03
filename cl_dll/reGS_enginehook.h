@@ -41,7 +41,7 @@ extern Utils utils;
 #else
 #define Find(future_name)                                                                                                                     \
 	{                                                                                                                                         \
-		ORIG_##future_name = decltype(ORIG_##future_name)(PL_GetProcAddress(utils.GetHandle(), #future_name));                                             \                                                                                                  \
+		ORIG_##future_name = decltype(ORIG_##future_name)(PL_GetProcAddress(utils.GetHandle(), #future_name));                                             \
 		if (ORIG_##future_name)                                                                                                               \
 		{                                                                                                                                     \
 			gEngfuncs.Con_DPrintf("[%s] Found " #future_name " at %p (using the %s pattern).\n", HWEXT, ORIG_##future_name); \
