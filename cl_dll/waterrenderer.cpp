@@ -34,6 +34,7 @@
 #include "SDL.h"
 #include "SDL_opengl.h"
 
+#include "reGS.h"
 
 std::string str_tolower(std::string s)
 {
