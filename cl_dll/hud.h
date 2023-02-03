@@ -476,6 +476,21 @@ private:
 	icon_sprite_t m_IconList[MAX_ICONSPRITES];
 };
 
+class CWaterRenderer
+{
+public:
+	int Init();
+	int VidInit();
+	int Draw();
+	void DrawQuad(int width, int height, int ofsX, int ofsY);
+	void AnimateWater();
+
+	void LoadWADFiles(void);
+	void FreeWADFiles(void);
+	void LoadWADTextures();
+};
+
+
 //
 //-----------------------------------------------------
 //

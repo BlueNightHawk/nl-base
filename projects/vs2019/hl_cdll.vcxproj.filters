@@ -94,8 +94,8 @@
     <Filter Include="Source Files\nl\reGS">
       <UniqueIdentifier>{d15d9c4c-dec7-49fa-8b51-bfccca16abc4}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Source Files\nl\fmod">
-      <UniqueIdentifier>{467a6134-ebf0-4283-bec1-c0df492a4472}</UniqueIdentifier>
+    <Filter Include="Source Files\nl\vfx">
+      <UniqueIdentifier>{a78353e2-d123-4dcf-a4af-a6ba72b9cd55}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -449,6 +449,9 @@
     </ClCompile>
     <ClCompile Include="..\..\cl_dll\reGS_glupload.cpp">
       <Filter>Source Files\nl\reGS</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\cl_dll\waterrenderer.cpp">
+      <Filter>Source Files\nl\vfx</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
