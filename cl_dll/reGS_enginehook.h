@@ -41,10 +41,10 @@ extern Utils utils;
 #else
 #define Hook(future_name, hook)                                                                                                               \
 	{                                                                                                                                         \
-		ORIG_##future_name = decltype(ORIG_##future_name) PL_GetProcAddress(utils.GetHandle(), #future_name);                                  \
+		ORIG_##future_name = decltype(ORIG_##future_name)(PL_GetProcAddress(utils.GetHandle(), #future_name));                                  \
 		if (ORIG_##future_name)                                                                                                             \
 		{                                                                                                                                     \
-			gEngfuncs.Con_DPrintf("[%s] Found " #future_name " at %p (using the %s pattern).\n", HWEXT, ORIG_##future_name, pattern->name()); \
+			gEngfuncs.Con_DPrintf("[%s] Found " #future_name " at %p.\n", HWEXT, ORIG_##future_name); \
 			void* p##future_name = (void*)ORIG_##future_name;                                                                                 \
 			hook.Install(p##future_name, (void*)future_name);                                                                                 \
 		}                                                                                                                                     \
