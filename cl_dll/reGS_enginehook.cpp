@@ -7,7 +7,7 @@ Utils utils = Utils::Utils(NULL, NULL, NULL);
 
 typedef int (*_build_number)();
 _build_number ORIG_build_number = nullptr;
-subhook::Hook build_numberHook;
+funchook_t* build_numberHook;
 
 int build_number();
 void HookBuildNum();
@@ -86,5 +86,7 @@ void HookBuildNum()
 
 void UnookBuildNum()
 {
-	build_numberHook.Remove();
+	funchook_uninstall(build_numberHook, 0);
+	funchook_destroy(build_numberHook);
+	build_numberHook = nullptr;
 }

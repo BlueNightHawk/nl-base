@@ -62,7 +62,7 @@
       <Optimization>Disabled</Optimization>
       <PreprocessorDefinitions>WIN32;_CRT_SECURE_NO_WARNINGS;_DEBUG;_WINDOWS;CLIENT_DLL;CLIENT_WEAPONS;HL_DLL;SUBHOOK_STATIC;WINDOWS_IGNORE_PACKING_MISMATCH;WITH_SDL2;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
-      <AdditionalIncludeDirectories>..\..\dlls;..\..\cl_dll;..\..\cl_dll\particleman;..\..\public;..\..\common;..\..\pm_shared;..\..\engine;..\..\utils\vgui\include;..\..\game_shared;..\..\external;..\..\imgui;..\..\external\SDL2;..\..\discord-rpc\include;..\..\rapidjson\include;..\..\SPTLib;..\..\soloud\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>..\..\dlls;..\..\cl_dll;..\..\cl_dll\particleman;..\..\public;..\..\common;..\..\pm_shared;..\..\engine;..\..\utils\vgui\include;..\..\game_shared;..\..\external;..\..\imgui;..\..\external\SDL2;..\..\discord-rpc\include;..\..\rapidjson\include;..\..\SPTLib;..\..\soloud\include;..\..\stb;..\..\funchook\include;..\..\distorm\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <RuntimeTypeInfo>true</RuntimeTypeInfo>
       <AdditionalOptions>/Zc:threadSafeInit- %(AdditionalOptions)</AdditionalOptions>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
@@ -92,7 +92,7 @@ cmd /c ""$(ProjectDir)..\..\filecopy.bat" "$(OutDir)" "cl_dlls" "$(TargetName).p
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <PreprocessorDefinitions>WIN32;_CRT_SECURE_NO_WARNINGS;NDEBUG;_WINDOWS;CLIENT_DLL;CLIENT_WEAPONS;HL_DLL;SUBHOOK_STATIC;WINDOWS_IGNORE_PACKING_MISMATCH;WITH_SDL2;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
-      <AdditionalIncludeDirectories>..\..\dlls;..\..\cl_dll;..\..\cl_dll\particleman;..\..\public;..\..\common;..\..\pm_shared;..\..\engine;..\..\utils\vgui\include;..\..\game_shared;..\..\external;..\..\imgui;..\..\external\SDL2;..\..\discord-rpc\include;..\..\rapidjson\include;..\..\SPTLib;..\..\soloud\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>..\..\dlls;..\..\cl_dll;..\..\cl_dll\particleman;..\..\public;..\..\common;..\..\pm_shared;..\..\engine;..\..\utils\vgui\include;..\..\game_shared;..\..\external;..\..\imgui;..\..\external\SDL2;..\..\discord-rpc\include;..\..\rapidjson\include;..\..\SPTLib;..\..\soloud\include;..\..\stb;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <RuntimeTypeInfo>true</RuntimeTypeInfo>
       <AdditionalOptions>/Zc:threadSafeInit- %(AdditionalOptions)</AdditionalOptions>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
@@ -130,6 +130,7 @@ cmd /c ""$(ProjectDir)..\..\filecopy.bat" "$(OutDir)" "cl_dlls" "$(TargetName).p
     <ClCompile Include="..\..\cl_dll\ev_common.cpp" />
     <ClCompile Include="..\..\cl_dll\ev_hldm.cpp" />
     <ClCompile Include="..\..\cl_dll\flashlight.cpp" />
+    <ClCompile Include="..\..\cl_dll\fs_paths.cpp" />
     <ClCompile Include="..\..\cl_dll\GameStudioModelRenderer.cpp" />
     <ClCompile Include="..\..\cl_dll\gameui.cpp" />
     <ClCompile Include="..\..\cl_dll\geiger.cpp" />
@@ -152,6 +153,8 @@ cmd /c ""$(ProjectDir)..\..\filecopy.bat" "$(OutDir)" "cl_dlls" "$(TargetName).p
     <ClCompile Include="..\..\cl_dll\menu.cpp" />
     <ClCompile Include="..\..\cl_dll\message.cpp" />
     <ClCompile Include="..\..\cl_dll\nlfuncs.cpp" />
+    <ClCompile Include="..\..\cl_dll\nlui_chapterselect.cpp" />
+    <ClCompile Include="..\..\cl_dll\nlui_utils.cpp" />
     <ClCompile Include="..\..\cl_dll\particleman\CBaseParticle.cpp" />
     <ClCompile Include="..\..\cl_dll\particleman\CMiniMem.cpp" />
     <ClCompile Include="..\..\cl_dll\particleman\CFrustum.cpp" />
@@ -192,6 +195,14 @@ cmd /c ""$(ProjectDir)..\..\filecopy.bat" "$(OutDir)" "cl_dlls" "$(TargetName).p
     <ClCompile Include="..\..\discord-rpc\src\dllmain.cpp" />
     <ClCompile Include="..\..\discord-rpc\src\rpc_connection.cpp" />
     <ClCompile Include="..\..\discord-rpc\src\serialization.cpp" />
+    <ClCompile Include="..\..\distorm\src\decoder.c" />
+    <ClCompile Include="..\..\distorm\src\distorm.c" />
+    <ClCompile Include="..\..\distorm\src\instructions.c" />
+    <ClCompile Include="..\..\distorm\src\insts.c" />
+    <ClCompile Include="..\..\distorm\src\mnemonics.c" />
+    <ClCompile Include="..\..\distorm\src\operands.c" />
+    <ClCompile Include="..\..\distorm\src\prefix.c" />
+    <ClCompile Include="..\..\distorm\src\textdefs.c" />
     <ClCompile Include="..\..\dlls\crossbow.cpp" />
     <ClCompile Include="..\..\dlls\crowbar.cpp" />
     <ClCompile Include="..\..\dlls\egon.cpp" />
@@ -207,6 +218,10 @@ cmd /c ""$(ProjectDir)..\..\filecopy.bat" "$(OutDir)" "cl_dlls" "$(TargetName).p
     <ClCompile Include="..\..\dlls\tripmine.cpp" />
     <ClCompile Include="..\..\dlls\weapons_shared.cpp" />
     <ClCompile Include="..\..\dlls\glock.cpp" />
+    <ClCompile Include="..\..\funchook\src\disasm_distorm.c" />
+    <ClCompile Include="..\..\funchook\src\funchook.c" />
+    <ClCompile Include="..\..\funchook\src\funchook_windows.c" />
+    <ClCompile Include="..\..\funchook\src\funchook_x86.c" />
     <ClCompile Include="..\..\game_shared\filesystem_utils.cpp" />
     <ClCompile Include="..\..\game_shared\vgui_checkbutton2.cpp" />
     <ClCompile Include="..\..\game_shared\vgui_grid.cpp" />
@@ -217,7 +232,7 @@ cmd /c ""$(ProjectDir)..\..\filecopy.bat" "$(OutDir)" "cl_dlls" "$(TargetName).p
     <ClCompile Include="..\..\game_shared\vgui_slider2.cpp" />
     <ClCompile Include="..\..\game_shared\voice_banmgr.cpp" />
     <ClCompile Include="..\..\imgui\backends\imgui_impl_opengl2.cpp" />
-    <ClCompile Include="..\..\imgui\backends\imgui_impl_sdl.cpp" />
+    <ClCompile Include="..\..\imgui\backends\imgui_impl_sdl2.cpp" />
     <ClCompile Include="..\..\imgui\imgui.cpp" />
     <ClCompile Include="..\..\imgui\imgui_demo.cpp" />
     <ClCompile Include="..\..\imgui\imgui_draw.cpp" />
@@ -227,6 +242,7 @@ cmd /c ""$(ProjectDir)..\..\filecopy.bat" "$(OutDir)" "cl_dlls" "$(TargetName).p
     <ClCompile Include="..\..\pm_shared\pm_math.cpp" />
     <ClCompile Include="..\..\pm_shared\pm_shared.cpp" />
     <ClCompile Include="..\..\public\interface.cpp" />
+    <ClCompile Include="..\..\public\registry.cpp" />
     <ClCompile Include="..\..\SPTLib\DetoursUtils.cpp" />
     <ClCompile Include="..\..\SPTLib\Hooks.cpp" />
     <ClCompile Include="..\..\SPTLib\Hooks_win.cpp" />
@@ -234,7 +250,7 @@ cmd /c ""$(ProjectDir)..\..\filecopy.bat" "$(OutDir)" "cl_dlls" "$(TargetName).p
     <ClCompile Include="..\..\SPTLib\MemUtils_win.cpp" />
     <ClCompile Include="..\..\SPTLib\sptlib-stdafx.cpp" />
     <ClCompile Include="..\..\SPTLib\sptlib.cpp" />
-    <ClCompile Include="..\..\subhook\subhook.c" />
+    <ClCompile Include="nlui_main.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\cl_dll\ammo.h" />
@@ -256,6 +272,9 @@ cmd /c ""$(ProjectDir)..\..\filecopy.bat" "$(OutDir)" "cl_dlls" "$(TargetName).p
     <ClInclude Include="..\..\cl_dll\in_defs.h" />
     <ClInclude Include="..\..\cl_dll\kbutton.h" />
     <ClInclude Include="..\..\cl_dll\nlfuncs.h" />
+    <ClInclude Include="..\..\cl_dll\nlui_chapterselect.h" />
+    <ClInclude Include="..\..\cl_dll\nlui_main.h" />
+    <ClInclude Include="..\..\cl_dll\nlui_utils.h" />
     <ClInclude Include="..\..\cl_dll\particleman\CBaseParticle.h" />
     <ClInclude Include="..\..\cl_dll\particleman\CFrustum.h" />
     <ClInclude Include="..\..\cl_dll\particleman\IParticleMan_Active.h" />
@@ -334,6 +353,8 @@ cmd /c ""$(ProjectDir)..\..\filecopy.bat" "$(OutDir)" "cl_dlls" "$(TargetName).p
     <ClInclude Include="..\..\pm_shared\pm_movevars.h" />
     <ClInclude Include="..\..\pm_shared\pm_shared.h" />
     <ClInclude Include="..\..\public\interface.h" />
+    <ClInclude Include="..\..\public\IRegistry.h" />
+    <ClInclude Include="..\..\public\registry.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

@@ -152,7 +152,7 @@ int CWaterRenderer::Init()
 	LoadWADTextures();
 	FreeWADFiles();
 
-	m_pCvarDrawAnimatedWater = CVAR_CREATE("r_animate_water", "1", FCVAR_ARCHIVE);
+	m_pCvarDrawAnimatedWater = CVAR_CREATE("r_animate_water", "0", FCVAR_ARCHIVE);
 	gl_texturemode = gEngfuncs.pfnGetCvarPointer("gl_texturemode");
 
 	return 1;
@@ -383,6 +383,19 @@ int CWaterRenderer::Draw()
 	if (m_pCvarDrawAnimatedWater->value <= 0)
 		return 0;
 
+	if (!strnicmp(gl_texturemode->name, "GL_LINEAR_", 10))
+	{
+		gEngfuncs.Cvar_Set(gl_texturemode->name, "GL_LINEAR");
+	}
+	else if (!strnicmp(gl_texturemode->name, "GL_NEAREST_", 11))
+	{
+		gEngfuncs.Cvar_Set(gl_texturemode->name, "GL_NEAREST");
+	}
+
+	if (stage == 2)
+		return 0;
+
+
 	// Initialization, search all entities with "!" texture flag
 	if (stage == 0)
 	{
@@ -431,14 +444,6 @@ int CWaterRenderer::Draw()
 		stage = 2;
 	}
 
-	if (!strnicmp(gl_texturemode->name, "GL_LINEAR_", 10))
-	{
-		gEngfuncs.Cvar_Set(gl_texturemode->name, "GL_LINEAR");
-	}
-	else if (!strnicmp(gl_texturemode->name, "GL_NEAREST_", 11))
-	{
-		gEngfuncs.Cvar_Set(gl_texturemode->name, "GL_NEAREST");
-	}
 
 	return true;
 }

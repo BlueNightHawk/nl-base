@@ -38,6 +38,9 @@
 
 #include "nlfuncs.h"
 
+#include "PlatformHeaders.h"
+#include "SDL_opengl.h"
+
 CWaterRenderer g_WaterRenderer;
 
 cl_enginefunc_t gEngfuncs;
@@ -54,6 +57,8 @@ void CL_UnloadParticleMan();
 void InitInput();
 void EV_HookEvents();
 void IN_Commands();
+
+void SetupPaths();
 
 /*
 ================================
@@ -131,6 +136,8 @@ int DLLEXPORT Initialize(cl_enginefunc_t* pEnginefuncs, int iVersion)
 		return 0;
 	}
 
+	SetupPaths();
+
 	// get tracker interface, if any
 	return 1;
 }
@@ -196,7 +203,9 @@ int DLLEXPORT HUD_Redraw(float time, int intermission)
 	g_WaterRenderer.Draw();
 	g_WaterRenderer.AnimateWater();
 
+	glDepthRange(0, 0);
 	gHUD.Redraw(time, 0 != intermission);
+	glDepthRange(0, 1);
 
 	return 1;
 }

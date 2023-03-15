@@ -6,7 +6,8 @@
 HL_SRC_DIR=$(SOURCE_DIR)/cl_dll
 HL_PARTICLEMAN_DIR=$(SOURCE_DIR)/cl_dll/particleman
 HL_SERVER_SRC_DIR=$(SOURCE_DIR)/dlls
-SUBHOOK_SRC_DIR=$(SOURCE_DIR)/subhook
+FUNCHOOK_SRC_DIR=$(SOURCE_DIR)/funchook/src
+DISTORM_SRC_DIR=$(SOURCE_DIR)/distorm/src
 IMGUI_SRC_DIR=$(SOURCE_DIR)/imgui
 IMGUI_BACKEND_SRC_DIR=$(SOURCE_DIR)/imgui/backends
 DISCORD_SRC_DIR=$(SOURCE_DIR)/discord-rpc/src
@@ -19,7 +20,8 @@ COMMON_OBJ_DIR=$(HL1_OBJ_DIR)/common
 GAME_SHARED_OBJ_DIR=$(HL1_OBJ_DIR)/game_shared
 HL1_SERVER_OBJ_DIR=$(HL1_OBJ_DIR)/server
 PM_SHARED_OBJ_DIR=$(HL1_OBJ_DIR)/pm_shared
-SUBHOOK_OBJ_DIR=$(HL1_OBJ_DIR)/subhook
+FUNCHOOK_OBJ_DIR=$(HL1_OBJ_DIR)/funchook/src
+DISTORM_OBJ_DIR=$(HL1_OBJ_DIR)/distorm/src
 IMGUI_OBJ_DIR=$(HL1_OBJ_DIR)/imgui
 IMGUI_BACKEND_OBJ_DIR=$(HL1_OBJ_DIR)/imgui/backends
 DISCORD_OBJ_DIR=$(HL1_OBJ_DIR)/discord-rpc/src
@@ -27,7 +29,7 @@ SPTLIB_OBJ_DIR=$(HL1_OBJ_DIR)/SPTLib
 
 CFLAGS=$(BASE_CFLAGS) $(ARCH_CFLAGS) -DCLIENT_DLL -DWITH_SDL2
 
-INCLUDEDIRS=-I$(HL_SRC_DIR) -I$(HL_PARTICLEMAN_DIR) -I../dlls -I/usr/include/malloc -I$(COMMON_SRC_DIR) -I$(PUBLIC_SRC_DIR) -I../pm_shared -I../engine -I../utils/vgui/include -I../game_shared -I../external -I../external/SDL2 -I../imgui -I../discord-rpc/include -I../rapidjson/include -I../SPTLib
+INCLUDEDIRS=-I$(HL_SRC_DIR) -I$(HL_PARTICLEMAN_DIR) -I../dlls -I/usr/include/malloc -I$(COMMON_SRC_DIR) -I$(PUBLIC_SRC_DIR) -I../pm_shared -I../engine -I../utils/vgui/include -I../game_shared -I../external -I../external/SDL2 -I../imgui -I../discord-rpc/include -I../rapidjson/include -I../SPTLib -I../distorm/include -I../funchook/include
 
 LDFLAGS=$(SHLIBLDFLAGS) $(CPP_LIB) -L$(CFG) vgui.so -L. libSDL2-2.0.so.0 -L libGL.so
 
@@ -56,6 +58,7 @@ HL1_OBJS = \
 	$(HL1_OBJ_DIR)/ev_common.o \
 	$(HL1_OBJ_DIR)/events.o \
 	$(HL1_OBJ_DIR)/flashlight.o \
+	$(HL1_OBJ_DIR)/fs_paths.o \
 	$(HL1_OBJ_DIR)/GameStudioModelRenderer.o \
 	$(HL1_OBJ_DIR)/gameui.o \
 	$(HL1_OBJ_DIR)/geiger.o \
@@ -71,7 +74,11 @@ HL1_OBJS = \
 	$(HL1_OBJ_DIR)/menu.o \
 	$(HL1_OBJ_DIR)/message.o \
 	$(HL1_OBJ_DIR)/nlfuncs.o \
+	$(HL1_OBJ_DIR)/nlui_chapterselect.o \
+	$(HL1_OBJ_DIR)/nlui_main.o \
+	$(HL1_OBJ_DIR)/nlui_utils.o \
 	$(HL1_OBJ_DIR)/platform_funcs.o \
+	$(HL1_OBJ_DIR)/registry.o \
 	$(HL1_OBJ_DIR)/reGS_enginehook.o \
 	$(HL1_OBJ_DIR)/reGS_glupload.o \
 	$(HL1_OBJ_DIR)/reGS_overbright.o \
@@ -126,6 +133,7 @@ DLL_OBJS = \
 
 PUBLIC_OBJS = \
 	$(PUBLIC_OBJ_DIR)/interface.o \
+	$(PUBLIC_OBJ_DIR)/registry.o \
 
 COMMON_OBJS = \
 	$(COMMON_OBJ_DIR)/mathlib.o \
@@ -147,8 +155,21 @@ PM_SHARED_OBJS = \
 	$(PM_SHARED_OBJ_DIR)/pm_shared.o \
 	$(PM_SHARED_OBJ_DIR)/pm_math.o \
 
-SUBHOOK_OBJS = \
-	$(SUBHOOK_OBJ_DIR)/subhook.o \
+FUNCHOOK_OBJS = \
+	$(FUNCHOOK_OBJ_DIR)/disarm_distorm.o \
+	$(FUNCHOOK_OBJ_DIR)/funchook.o \
+	$(FUNCHOOK_OBJ_DIR)/funchook_unix.o \
+	$(FUNCHOOK_OBJ_DIR)/funchook_x86.o \
+
+DISTORM_OBJS = \
+	$(DISTORM_OBJ_DIR)/decoder.o \
+	$(DISTORM_OBJ_DIR)/distorm.o \
+	$(DISTORM_OBJ_DIR)/instructions.o \
+	$(DISTORM_OBJ_DIR)/insts.o \
+	$(DISTORM_OBJ_DIR)/mnemonics.o \
+	$(DISTORM_OBJ_DIR)/operands.o \
+	$(DISTORM_OBJ_DIR)/prefix.o \
+	$(DISTORM_OBJ_DIR)/textdefs.o \
 
 IMGUI_OBJS = \
 	$(IMGUI_OBJ_DIR)/imgui.o \
@@ -159,7 +180,7 @@ IMGUI_OBJS = \
 
 IMGUI_BACKEND_OBJS = \
 	$(IMGUI_BACKEND_OBJ_DIR)/imgui_impl_opengl2.o \
-	$(IMGUI_BACKEND_OBJ_DIR)/imgui_impl_sdl.o \
+	$(IMGUI_BACKEND_OBJ_DIR)/imgui_impl_sdl2.o \
 
 DISCORD_OBJS = \
 	$(DISCORD_OBJ_DIR)/connection_unix.o \
@@ -180,8 +201,8 @@ SPTLIB_OBJS = \
 
 all: client.$(SHLIBEXT)
 
-client.$(SHLIBEXT): $(HL1_OBJS) $(PUBLIC_OBJS) $(COMMON_OBJS) $(GAME_SHARED_OBJS) $(DLL_OBJS) $(PM_SHARED_OBJS) $(SUBHOOK_OBJS) $(IMGUI_OBJS) $(IMGUI_BACKEND_OBJS) $(DISCORD_OBJS) $(SPTLIB_OBJS) $(HL1_PARTICLEMAN_OBJS)
-	$(CPLUS) -o $(BUILD_DIR)/$@ $(HL1_OBJS) $(PUBLIC_OBJS) $(COMMON_OBJS) $(GAME_SHARED_OBJS) $(DLL_OBJS) $(PM_SHARED_OBJS) $(SUBHOOK_OBJS) $(IMGUI_OBJS) $(IMGUI_BACKEND_OBJS) $(DISCORD_OBJS) $(SPTLIB_OBJS) $(HL1_PARTICLEMAN_OBJS) $(LDFLAGS) $(CPP_LIB)
+client.$(SHLIBEXT): $(HL1_OBJS) $(PUBLIC_OBJS) $(COMMON_OBJS) $(GAME_SHARED_OBJS) $(DLL_OBJS) $(PM_SHARED_OBJS) $(FUNCHOOK_OBJS) $(DISTORM_OBJS) $(IMGUI_OBJS) $(IMGUI_BACKEND_OBJS) $(DISCORD_OBJS) $(SPTLIB_OBJS) $(HL1_PARTICLEMAN_OBJS)
+	$(CPLUS) -o $(BUILD_DIR)/$@ $(HL1_OBJS) $(PUBLIC_OBJS) $(COMMON_OBJS) $(GAME_SHARED_OBJS) $(DLL_OBJS) $(PM_SHARED_OBJS) $(FUNCHOOK_OBJS) $(DISTORM_OBJS) $(IMGUI_OBJS) $(IMGUI_BACKEND_OBJS) $(DISCORD_OBJS) $(SPTLIB_OBJS) $(HL1_PARTICLEMAN_OBJS) $(LDFLAGS) $(CPP_LIB)
 	./gendbg.sh $(BUILD_DIR)/client.$(SHLIBEXT)
 
 $(HL1_OBJ_DIR):
@@ -207,8 +228,11 @@ $(GAME_SHARED_OBJ_DIR):
 $(PM_SHARED_OBJ_DIR):
 	mkdir -p $(PM_SHARED_OBJ_DIR)
 
-$(SUBHOOK_OBJ_DIR):
-	mkdir -p $(SUBHOOK_OBJ_DIR)
+$(FUNCHOOK_OBJ_DIR):
+	mkdir -p $(FUNCHOOK_OBJ_DIR)
+
+$(DISTORM_OBJ_DIR):
+	mkdir -p $(DISTORM_OBJ_DIR)
 
 $(IMGUI_OBJ_DIR):
 	mkdir -p $(IMGUI_OBJ_DIR)
@@ -252,7 +276,10 @@ $(GAME_SHARED_OBJ_DIR)/%.o : $(GAME_SHARED_SRC_DIR)/%.cpp $(filter-out $(wildcar
 $(PM_SHARED_OBJ_DIR)/%.o : $(PM_SRC_DIR)/%.cpp $(filter-out $(wildcard  $(PM_SHARED_OBJ_DIR)),  $(PM_SHARED_OBJ_DIR))
 	$(DO_CC)
 
-$(SUBHOOK_OBJ_DIR)/%.o : $(SUBHOOK_SRC_DIR)/%.c $(filter-out $(wildcard  $(SUBHOOK_OBJ_DIR)),  $(SUBHOOK_OBJ_DIR))
+$(FUNCHOOK_OBJ_DIR)/%.o : $(SUBHOOK_SRC_DIR)/%.c $(filter-out $(wildcard  $(FUNCHOOK_OBJ_DIR)),  $(FUNCHOOK_OBJ_DIR))
+	$(DO_CC)
+
+$(DISTORM_OBJ_DIR)/%.o : $(SUBHOOK_SRC_DIR)/%.c $(filter-out $(wildcard  $(DISTORM_OBJ_DIR)),  $(DISTORM_OBJ_DIR))
 	$(DO_CC)
 
 $(IMGUI_OBJ_DIR)/%.o : $(IMGUI_SRC_DIR)/%.cpp $(filter-out $(wildcard  $(IMGUI_OBJ_DIR)),  $(IMGUI_OBJ_DIR))

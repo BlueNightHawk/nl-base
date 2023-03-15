@@ -28,9 +28,9 @@ _GL_ResampleTexture ORIG_GL_ResampleTexture = NULL;
 _GL_ResampleAlphaTexture ORIG_GL_ResampleAlphaTexture = NULL;
 _VideoMode_GetCurrentVideoMode ORIG_VideoMode_GetCurrentVideoMode = NULL;
 
-subhook::Hook GL_Upload32Hook;
-subhook::Hook GL_Upload16Hook;
-subhook::Hook BuildGammaTableHook;
+funchook_t *GL_Upload32Hook;
+funchook_t* GL_Upload16Hook;
+funchook_t* BuildGammaTableHook;
 
 cvar_t *brightness, *texgamma;
 cvar_t* gl_dither;
@@ -85,13 +85,7 @@ void BuildGammaTable(float g)
 	// ...
 	// Further code is for other gamma tables. Not necessary for GL_Upload32/16.
 	g = original_g;
-#ifdef WIN32
-	((_BuildGammaTable)(BuildGammaTableHook.GetTrampoline()))(g);
-#else
-	subhook::ScopedHookRemove remove(&BuildGammaTableHook);
 	ORIG_BuildGammaTable(g);
-	BuildGammaTableHook.Install();
-#endif
 }
 
 void BoxFilter3x3(byte* out, byte* in, int w, int h, int x, int y)
@@ -411,7 +405,14 @@ void GLDraw_Hook()
 
 void GLDraw_UnHook()
 {
-	BuildGammaTableHook.Remove();
-	GL_Upload32Hook.Remove();
-	GL_Upload16Hook.Remove();
+	funchook_uninstall(BuildGammaTableHook, 0);
+	funchook_uninstall(GL_Upload32Hook, 0);
+	funchook_uninstall(GL_Upload16Hook, 0);
+	funchook_destroy(BuildGammaTableHook);
+	funchook_destroy(GL_Upload32Hook);
+	funchook_destroy(GL_Upload16Hook);
+
+	GL_Upload32Hook = nullptr;
+	GL_Upload16Hook = nullptr;
+	BuildGammaTableHook = nullptr;
 }

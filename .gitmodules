@@ -7,6 +7,12 @@
 [submodule "rapidjson"]
 	path = rapidjson
 	url = https://github.com/Tencent/rapidjson
-[submodule "subhook"]
-	path = subhook
-	url = https://github.com/BlueNightHawk/subhook
+[submodule "stb"]
+	path = stb
+	url = https://github.com/nothings/stb
+[submodule "funchook"]
+	path = funchook
+	url = https://github.com/kubo/funchook
+[submodule "distorm"]
+	path = distorm
+	url = https://github.com/gdabah/distorm

@@ -13,7 +13,8 @@
 #include "studio.h"
 #include "com_model.h"
 #include "PlatformHeaders.h"
-#include "../../subhook/subhook.h"
+#include "funchook.h"
+
 #include "sptlib-stdafx.hpp"
 #include "MemUtils.hpp"
 #include "Utils.hpp"

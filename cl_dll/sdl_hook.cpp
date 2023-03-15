@@ -1,9 +1,10 @@
 #include "cl_dll.h"
 #include "cdll_int.h"
 #include <SDL2/SDL.h>
-#include "../../subhook/subhook.h"
 #include "PlatformHeaders.h"
+#include "funchook.h"
 #include <assert.h>
+#include "nlui_utils.h"
 
 #ifdef WIN32
 #define SDL2_PLATFORM "SDL2.dll"
@@ -11,7 +12,7 @@
 #define SDL2_PLATFORM "./libSDL2.so"
 #endif
 
-subhook::Hook SwapWindowHook;
+funchook_t* SwapWindowHook;
 extern SDL_Window* window;
 
 typedef void (*pfnSDL_GL_SwapWindow)(SDL_Window* window);
@@ -24,16 +25,9 @@ void SDLCALL HOOKED_SDL_GL_SwapWindow(SDL_Window* window)
 {
 	::window = window;
 	DrawImgui();
-
-#ifdef WIN32
-	((pfnSDL_GL_SwapWindow)(SwapWindowHook.GetTrampoline()))(window);
-#else
-	subhook::ScopedHookRemove remove(&SwapWindowHook);
+	NLUtils::Update(window);
 
 	pSDL_GL_SwapWindow(window);
-
-	SwapWindowHook.Install((void*)pSDL_GL_SwapWindow, (void*)&HOOKED_SDL_GL_SwapWindow);
-#endif
 }
 
 void* GetSwapWindowPtr()
@@ -50,10 +44,15 @@ void HookSdl()
 	if (pSDL_GL_SwapWindow == nullptr)
 		return;
 
-	SwapWindowHook.Install((void*)pSDL_GL_SwapWindow, (void*)&HOOKED_SDL_GL_SwapWindow);
+	SwapWindowHook = funchook_create();
+	funchook_prepare(SwapWindowHook, (void**)&pSDL_GL_SwapWindow, HOOKED_SDL_GL_SwapWindow);
+	funchook_install(SwapWindowHook, 0);
 }
 
 void UnHookSdl()
 {
-	SwapWindowHook.Remove();
+	funchook_uninstall(SwapWindowHook, 0);
+	funchook_destroy(SwapWindowHook);
+	SwapWindowHook = nullptr;
+	//DisableHook(&SwapWindowHook);
 }

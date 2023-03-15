@@ -5,9 +5,10 @@
 #include "SDL_opengl.h"
 #include "imgui.h"
 #include "backends/imgui_impl_opengl2.h"
-#include "backends/imgui_impl_sdl.h"
+#include "backends/imgui_impl_sdl2.h"
 #include "nlfuncs.h"
 #include "igameui.h"
+#include "nlui_main.h"
 
 SDL_Window* window = nullptr;
 
@@ -31,6 +32,47 @@ bool CanShowMenu()
 	return (staticGameUIFuncs->IsGameUIActive() - iActiveKey) == 0;
 }
 
+
+void InitColorScheme()
+{
+	int i = 0;
+	static char token[512];
+	char *pfile, *afile;
+	pfile = afile = reinterpret_cast<char*>(gEngfuncs.COM_LoadFile("resource/nlui/colorscheme.txt", 5, 0));
+
+	if (!pfile || !afile)
+	{
+		ImGui::StyleColorsDark();
+		return;
+	}
+	auto &col = ImGui::GetStyle().Colors;
+
+	while (pfile = gEngfuncs.COM_ParseFile(pfile, token))
+	{
+		if (i >= ImGuiCol_COUNT)
+			break;
+
+		if (strlen(token) == 0)
+			continue;
+
+		pfile = gEngfuncs.COM_ParseFile(pfile, token);
+		col[i].x = atof(token);
+		pfile = gEngfuncs.COM_ParseFile(pfile, token);
+		col[i].y = atof(token);
+		pfile = gEngfuncs.COM_ParseFile(pfile, token);
+		col[i].z = atof(token);
+		pfile = gEngfuncs.COM_ParseFile(pfile, token);
+		col[i].w = atof(token);
+
+		i++;
+	}
+
+	gEngfuncs.COM_FreeFile(afile);
+
+	ImGui::GetStyle().FrameBorderSize = 0.04;
+	ImGui::GetStyle().WindowBorderSize = 0.2;
+}
+
 void InitImgui()
 {
 	assert(window != nullptr);
@@ -45,9 +87,6 @@ void InitImgui()
 
 	io.ConfigFlags |= ImGuiConfigFlags_NoMouseCursorChange;
 
-	// Setup Dear ImGui style
-	ImGui::StyleColorsDark();
-
 	// Setup Platform/Renderer backends
 	ImGui_ImplSDL2_InitForOpenGL(window, ImGui::GetCurrentContext());
 	ImGui_ImplOpenGL2_Init();
@@ -55,6 +94,12 @@ void InitImgui()
 	SDL_AddEventWatch(&ProcessEvent, nullptr);
 
 	g_bImGuiInit = true;
+
+	InitColorScheme();
+
+	ImFont* font1 = io.Fonts->AddFontFromFileTTF(((string) "./" + gEngfuncs.pfnGetGameDirectory() + "/resource/nlui/tahoma.ttf").c_str(), 24);
+
+	g_ImGuiManager.Init();
 }
 
 void DrawImgui()
@@ -74,7 +119,7 @@ void DrawImgui()
 
 	if (CanShowMenu())
 	{
-		ImGui::ShowDemoWindow();
+		g_ImGuiManager.Update();
 	}
     // Rendering
 	ImGui::Render();
@@ -84,6 +129,8 @@ void DrawImgui()
 
 void ShutdownImgui()
 {
+	g_ImGuiManager.Shutdown();
+
 	// Cleanup
 	ImGui_ImplOpenGL2_Shutdown();
 	ImGui_ImplSDL2_Shutdown();
