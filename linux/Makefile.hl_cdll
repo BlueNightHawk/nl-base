@@ -29,7 +29,7 @@ SPTLIB_OBJ_DIR=$(HL1_OBJ_DIR)/SPTLib
 
 CFLAGS=$(BASE_CFLAGS) $(ARCH_CFLAGS) -DCLIENT_DLL -DWITH_SDL2
 
-INCLUDEDIRS=-I$(HL_SRC_DIR) -I$(HL_PARTICLEMAN_DIR) -I../dlls -I/usr/include/malloc -I$(COMMON_SRC_DIR) -I$(PUBLIC_SRC_DIR) -I../pm_shared -I../engine -I../utils/vgui/include -I../game_shared -I../external -I../external/SDL2 -I../imgui -I../discord-rpc/include -I../rapidjson/include -I../SPTLib -I../distorm/include -I../funchook/include
+INCLUDEDIRS=-I$(HL_SRC_DIR) -I$(HL_PARTICLEMAN_DIR) -I../dlls -I/usr/include/malloc -I$(COMMON_SRC_DIR) -I$(PUBLIC_SRC_DIR) -I../pm_shared -I../engine -I../utils/vgui/include -I../game_shared -I../external -I../external/SDL2 -I../imgui -I../discord-rpc/include -I../rapidjson/include -I../SPTLib -I../distorm/include -I../funchook/include -I../stb
 
 LDFLAGS=$(SHLIBLDFLAGS) $(CPP_LIB) -L$(CFG) vgui.so -L. libSDL2-2.0.so.0 -L libGL.so
 
@@ -155,7 +155,7 @@ PM_SHARED_OBJS = \
 	$(PM_SHARED_OBJ_DIR)/pm_math.o \
 
 FUNCHOOK_OBJS = \
-	$(FUNCHOOK_OBJ_DIR)/disarm_distorm.o \
+	$(FUNCHOOK_OBJ_DIR)/disasm_distorm.o \
 	$(FUNCHOOK_OBJ_DIR)/funchook.o \
 	$(FUNCHOOK_OBJ_DIR)/funchook_unix.o \
 	$(FUNCHOOK_OBJ_DIR)/funchook_x86.o \
