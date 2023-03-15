@@ -136,11 +136,11 @@ int CRegistry::ReadInt(const char* key, int defaultValue)
 {
 	GetKeyValues();
 
-	if (m_vecValues.Count() > 0)
+	if (m_vecValues.size() > 0)
 	{
 		const auto uiLength = strlen(key);
 
-		for (int i = 0; i < m_vecValues.Count(); ++i)
+		for (int i = 0; i < m_vecValues.size(); ++i)
 		{
 			if (!strnicmp(key, m_vecValues[i].key, uiLength))
 			{
@@ -161,7 +161,7 @@ void CRegistry::WriteInt(const char* key, int value)
 
 	int i;
 
-	for (i = 0; i < m_vecValues.Count(); ++i)
+	for (i = 0; i < m_vecValues.size(); ++i)
 	{
 		if (!strnicmp(key, m_vecValues[i].key, strlen(key)))
 		{
@@ -170,15 +170,15 @@ void CRegistry::WriteInt(const char* key, int value)
 		}
 	}
 
-	if (i == m_vecValues.Count())
+	if (i == m_vecValues.size())
 	{
-		auto& val = m_vecValues[m_vecValues.AddToTail()];
+		auto& val = m_vecValues.emplace_back();
 
 		strncpy(val.key, key, ARRAYSIZE(val.key));
 		strncpy(val.value, szVal, ARRAYSIZE(val.value));
 	}
 
-	if (m_vecValues.Count())
+	if (m_vecValues.size())
 		WriteKeyValuesToDisk();
 }
 
@@ -186,11 +186,11 @@ const char* CRegistry::ReadString(const char* key, const char* defaultValue)
 {
 	GetKeyValues();
 
-	if (m_vecValues.Count() > 0)
+	if (m_vecValues.size() > 0)
 	{
 		const auto uiLength = strlen(key);
 
-		for (int i = 0; i < m_vecValues.Count(); ++i)
+		for (int i = 0; i < m_vecValues.size(); ++i)
 		{
 			if (!strnicmp(key, m_vecValues[i].key, uiLength))
 			{
@@ -208,7 +208,7 @@ void CRegistry::WriteString(const char* key, const char* string)
 
 	int i;
 
-	for (i = 0; i < m_vecValues.Count(); ++i)
+	for (i = 0; i < m_vecValues.size(); ++i)
 	{
 		if (!strnicmp(key, m_vecValues[i].key, strlen(key)))
 		{
@@ -217,15 +217,15 @@ void CRegistry::WriteString(const char* key, const char* string)
 		}
 	}
 
-	if (i == m_vecValues.Count())
+	if (i == m_vecValues.size())
 	{
-		auto& val = m_vecValues[m_vecValues.AddToTail()];
+		auto& val = m_vecValues.emplace_back();
 
 		strncpy(val.key, key, ARRAYSIZE(val.key));
 		strncpy(val.value, string, ARRAYSIZE(val.value));
 	}
 
-	if (m_vecValues.Count())
+	if (m_vecValues.size())
 		WriteKeyValuesToDisk();
 }
 
@@ -234,7 +234,7 @@ void CRegistry::LoadKeyValuesFromDisk()
 	if (m_fConfig)
 		fclose(m_fConfig);
 
-	m_vecValues.Purge();
+	m_vecValues.clear();
 
 	char szFileName[MAX_PATH];
 	snprintf(szFileName, ARRAYSIZE(szFileName), "%s.conf", "hl");
@@ -268,7 +268,7 @@ void CRegistry::LoadKeyValuesFromDisk()
 				strncpy(val.key, szLine, ARRAYSIZE(val.key));
 				strncpy(val.value, pszValue, ARRAYSIZE(val.value));
 
-				m_vecValues.AddToTail(val);
+				m_vecValues.push_back(val);
 			}
 		}
 
@@ -285,7 +285,7 @@ void CRegistry::WriteKeyValuesToDisk()
 	// TODO: check if file failed to open - Solokiller
 	m_fConfig = fopen(szFileName, "w+");
 
-	for (int i = 0; i < m_vecValues.Count(); ++i)
+	for (int i = 0; i < m_vecValues.size(); ++i)
 	{
 		fprintf(m_fConfig, "%s=%s\n", m_vecValues[i].key, m_vecValues[i].value);
 	}
@@ -296,7 +296,7 @@ void CRegistry::WriteKeyValuesToDisk()
 
 void CRegistry::GetKeyValues()
 {
-	if (!m_vecValues.Count())
+	if (!m_vecValues.size())
 		LoadKeyValuesFromDisk();
 }
 #endif

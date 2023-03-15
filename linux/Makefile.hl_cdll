@@ -78,7 +78,6 @@ HL1_OBJS = \
 	$(HL1_OBJ_DIR)/nlui_main.o \
 	$(HL1_OBJ_DIR)/nlui_utils.o \
 	$(HL1_OBJ_DIR)/platform_funcs.o \
-	$(HL1_OBJ_DIR)/registry.o \
 	$(HL1_OBJ_DIR)/reGS_enginehook.o \
 	$(HL1_OBJ_DIR)/reGS_glupload.o \
 	$(HL1_OBJ_DIR)/reGS_overbright.o \

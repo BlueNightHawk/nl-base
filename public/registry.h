@@ -4,7 +4,7 @@
 #ifndef WIN32
 #include <cstdio>
 
-#include <UtlVector.h>
+#include <vector>
 #endif
 
 #include "IRegistry.h"
@@ -46,7 +46,7 @@ private:
 	bool m_bValid = false;
 	int m_hKey = 0;
 	FILE* m_fConfig = nullptr;
-	CUtlVector<KV> m_vecValues;
+	std::vector<KV> m_vecValues;
 #endif
 };
 
