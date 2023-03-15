@@ -6,6 +6,9 @@
 #undef GetCurrentTime
 #else
 
+#include "hud.h"
+#include "cl_util.h"
+
 #endif
 
 #include "registry.h"
