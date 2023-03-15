@@ -9,6 +9,8 @@
 #include "hud.h"
 #include "cl_util.h"
 
+#define MAX_PATH 260
+
 #endif
 
 #include "registry.h"
