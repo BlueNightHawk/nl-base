@@ -6,6 +6,8 @@
 #include "igameui.h"
 #include "reGS.h"
 
+funchook_t* g_Hook;
+
 void HookSdl();
 void UnHookSdl();
 
@@ -18,6 +20,8 @@ void NL_Init()
 	HookSdl();
 	InitDiscord();
 	HWHook();
+
+	funchook_install(g_Hook, 0);
 
 #ifdef WIN32
 	Hooks::Init(false);
@@ -36,4 +40,7 @@ void NL_Shutdown()
 	UnHookSdl();
 	ShutdownGameUI();
 	ShutdownPresence();
+
+	funchook_uninstall(g_Hook, 0);
+	funchook_destroy(g_Hook);
 }

@@ -163,6 +163,7 @@ cmd /c ""$(ProjectDir)..\..\filecopy.bat" "$(OutDir)" "cl_dlls" "$(TargetName).p
     <ClCompile Include="..\..\cl_dll\platform_funcs.cpp" />
     <ClCompile Include="..\..\cl_dll\reGS_enginehook.cpp" />
     <ClCompile Include="..\..\cl_dll\reGS_glupload.cpp" />
+    <ClCompile Include="..\..\cl_dll\reGS_hudspr.cpp" />
     <ClCompile Include="..\..\cl_dll\reGS_overbright.cpp" />
     <ClCompile Include="..\..\cl_dll\reGS_vguiwrap2.cpp" />
     <ClCompile Include="..\..\cl_dll\saytext.cpp" />

@@ -7,7 +7,6 @@ Utils utils = Utils::Utils(NULL, NULL, NULL);
 
 typedef int (*_build_number)();
 _build_number ORIG_build_number = nullptr;
-funchook_t* build_numberHook;
 
 int build_number();
 void HookBuildNum();
@@ -81,12 +80,9 @@ int build_number()
 
 void HookBuildNum()
 {
-	Hook(build_number, build_numberHook);
+	Hook(build_number);
 }
 
 void UnookBuildNum()
 {
-	funchook_uninstall(build_numberHook, 0);
-	funchook_destroy(build_numberHook);
-	build_numberHook = nullptr;
 }

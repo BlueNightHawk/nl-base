@@ -6,8 +6,6 @@ _R_BuildLightMap ORIG_R_BuildLightMap = NULL;
 
 qboolean* gl_texsort;
 
-funchook_t *R_BuildLightMapHook;
-
 void R_BuildLightMap(msurface_t* psurf, uint8_t* dest, int stride)
 {
 	// gl_overbright fix ** note: detail textures won't work after that! **
@@ -41,9 +39,9 @@ void R_Hook()
 	if (ORIG_R_BuildLightMap)
 	{
 		gEngfuncs.Con_DPrintf("[%s] Found R_BuildLightMap at %p (using the %s pattern).\n", HWEXT, ORIG_R_BuildLightMap, pattern->name());
-		R_BuildLightMapHook = funchook_create();
-		funchook_prepare(R_BuildLightMapHook, (void**)&ORIG_R_BuildLightMap, (void*)&R_BuildLightMap);
-		funchook_install(R_BuildLightMapHook, 0);																																																	\
+		g_Hook = funchook_create();
+		funchook_prepare(g_Hook, (void**)&ORIG_R_BuildLightMap, (void*)&R_BuildLightMap);
+		funchook_install(g_Hook, 0);																																																	\
 	}
 	else
 		gEngfuncs.Con_DPrintf("[%s] Could not find R_BuildLightMap.\n", HWEXT);
@@ -53,7 +51,4 @@ void R_Hook()
 void R_UnHook()
 {
 	gl_texsort = nullptr;
-	funchook_uninstall(R_BuildLightMapHook, 0);
-	funchook_destroy(R_BuildLightMapHook);
-	R_BuildLightMapHook = nullptr;
 }

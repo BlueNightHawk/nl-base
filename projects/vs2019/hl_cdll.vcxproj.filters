@@ -513,6 +513,9 @@
     <ClCompile Include="..\..\cl_dll\nlui_main.cpp">
       <Filter>Source Files\nl\nlui_vanilla</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\cl_dll\reGS_hudspr.cpp">
+      <Filter>Source Files\nl\reGS</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\cl_dll\kbutton.h">

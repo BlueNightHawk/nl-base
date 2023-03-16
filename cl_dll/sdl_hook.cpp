@@ -12,7 +12,8 @@
 #define SDL2_PLATFORM "./libSDL2.so"
 #endif
 
-funchook_t* SwapWindowHook;
+extern funchook_t* g_Hook;
+
 extern SDL_Window* window;
 
 typedef void (*pfnSDL_GL_SwapWindow)(SDL_Window* window);
@@ -44,15 +45,12 @@ void HookSdl()
 	if (pSDL_GL_SwapWindow == nullptr)
 		return;
 
-	SwapWindowHook = funchook_create();
-	funchook_prepare(SwapWindowHook, (void**)&pSDL_GL_SwapWindow, HOOKED_SDL_GL_SwapWindow);
-	funchook_install(SwapWindowHook, 0);
+	g_Hook = funchook_create();
+	funchook_prepare(g_Hook, (void**)&pSDL_GL_SwapWindow, HOOKED_SDL_GL_SwapWindow);
+	funchook_install(g_Hook, 0);
 }
 
 void UnHookSdl()
 {
-	funchook_uninstall(SwapWindowHook, 0);
-	funchook_destroy(SwapWindowHook);
-	SwapWindowHook = nullptr;
 	//DisableHook(&SwapWindowHook);
 }

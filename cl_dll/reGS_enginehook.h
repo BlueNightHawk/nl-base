@@ -23,16 +23,16 @@ extern Utils utils;
 		}                                                                                                                                     \
 	}
 
-#define Hook(future_name, hook)                                                                                                                  \
+#define Hook(future_name)                                                                                                                  \
 	{                                                                                                                                      \
 		auto f##future_name = utils.FindAsync(ORIG_##future_name, patterns::engine::future_name);                                          \
 		auto pattern = f##future_name.get();                                                                                               \
 		if (ORIG_##future_name)                                                                                                            \
 		{                                                                                                                                  \
 			gEngfuncs.Con_DPrintf("[%s] Found " #future_name " at %p (using the %s pattern).\n", HWEXT, ORIG_##future_name, pattern->name()); \
-			hook = funchook_create();																											\
-			funchook_prepare(hook, (void**)&ORIG_##future_name, (void*)&future_name);											\
-			funchook_install(hook, 0);																								\
+			g_Hook = funchook_create();																											\
+			funchook_prepare(g_Hook, (void**)&ORIG_##future_name, (void*)&future_name);											\
+			funchook_install(g_Hook, 0);																								\
 		}                                                                                                                                  \
 		else                                                                                                                               \
 		{                                                                                                                                  \
@@ -49,15 +49,15 @@ extern Utils utils;
 		}                                                                                                                                     \
 	}
 
-#define Hook(future_name, hook)                                                                                                               \
+#define Hook(future_name)                                                                                                               \
 	{                                                                                                                                         \
 		ORIG_##future_name = decltype(ORIG_##future_name)(PL_GetProcAddress(utils.GetHandle(), #future_name));                                  \
 		if (ORIG_##future_name)                                                                                                             \
 		{                                                                                                                                     \
 			gEngfuncs.Con_DPrintf("[%s] Found " #future_name ".\n", HWEXT); \
-			hook = funchook_create();                                                                          \
-			funchook_prepare(hook, (void**)&ORIG_##future_name, (void*)&future_name);                          \
-			funchook_install(hook, 0);																								\
+			g_Hook = funchook_create();                                                                          \
+			funchook_prepare(g_Hook, (void**)&ORIG_##future_name, (void*)&future_name);                          \
+			funchook_install(g_Hook, 0);																								\
 		}                                                                                                                                     \
 		else                                                                                                                                  \
 		{                                                                                                                                     \

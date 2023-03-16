@@ -15,12 +15,15 @@
 #include "PlatformHeaders.h"
 #include "funchook.h"
 
+extern funchook_t* g_Hook;
+
 #include "sptlib-stdafx.hpp"
 #include "MemUtils.hpp"
 #include "Utils.hpp"
 #include "reGS_patterns.hpp"
 #include "Hooks.hpp"
 #include "reGS_enginehook.h"
+
 
 
 void VGuiWrap2_Hook();

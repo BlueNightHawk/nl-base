@@ -28,10 +28,6 @@ _GL_ResampleTexture ORIG_GL_ResampleTexture = NULL;
 _GL_ResampleAlphaTexture ORIG_GL_ResampleAlphaTexture = NULL;
 _VideoMode_GetCurrentVideoMode ORIG_VideoMode_GetCurrentVideoMode = NULL;
 
-funchook_t *GL_Upload32Hook;
-funchook_t* GL_Upload16Hook;
-funchook_t* BuildGammaTableHook;
-
 cvar_t *brightness, *texgamma;
 cvar_t* gl_dither;
 cvar_t* gl_ansio;
@@ -393,9 +389,9 @@ void GLDraw_Hook()
 	gl_spriteblend = gEngfuncs.pfnGetCvarPointer("gl_spriteblend");
 	gl_ansio = gEngfuncs.pfnGetCvarPointer("gl_ansio");
 
-	Hook(BuildGammaTable, BuildGammaTableHook);
-	Hook(GL_Upload32, GL_Upload32Hook);
-	Hook(GL_Upload16, GL_Upload16Hook);
+	Hook(BuildGammaTable);
+	Hook(GL_Upload32);
+	Hook(GL_Upload16);
 	Find(BoxFilter3x3);
 	Find(GL_ResampleTexture);
 	Find(GL_ResampleAlphaTexture);
@@ -405,14 +401,4 @@ void GLDraw_Hook()
 
 void GLDraw_UnHook()
 {
-	funchook_uninstall(BuildGammaTableHook, 0);
-	funchook_uninstall(GL_Upload32Hook, 0);
-	funchook_uninstall(GL_Upload16Hook, 0);
-	funchook_destroy(BuildGammaTableHook);
-	funchook_destroy(GL_Upload32Hook);
-	funchook_destroy(GL_Upload16Hook);
-
-	GL_Upload32Hook = nullptr;
-	GL_Upload16Hook = nullptr;
-	BuildGammaTableHook = nullptr;
 }
