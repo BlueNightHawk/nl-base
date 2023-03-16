@@ -154,6 +154,7 @@ cmd /c ""$(ProjectDir)..\..\filecopy.bat" "$(OutDir)" "cl_dlls" "$(TargetName).p
     <ClCompile Include="..\..\cl_dll\message.cpp" />
     <ClCompile Include="..\..\cl_dll\nlfuncs.cpp" />
     <ClCompile Include="..\..\cl_dll\nlui_chapterselect.cpp" />
+    <ClCompile Include="..\..\cl_dll\nlui_main.cpp" />
     <ClCompile Include="..\..\cl_dll\nlui_utils.cpp" />
     <ClCompile Include="..\..\cl_dll\particleman\CBaseParticle.cpp" />
     <ClCompile Include="..\..\cl_dll\particleman\CMiniMem.cpp" />
@@ -250,7 +251,6 @@ cmd /c ""$(ProjectDir)..\..\filecopy.bat" "$(OutDir)" "cl_dlls" "$(TargetName).p
     <ClCompile Include="..\..\SPTLib\MemUtils_win.cpp" />
     <ClCompile Include="..\..\SPTLib\sptlib-stdafx.cpp" />
     <ClCompile Include="..\..\SPTLib\sptlib.cpp" />
-    <ClCompile Include="nlui_main.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\cl_dll\ammo.h" />

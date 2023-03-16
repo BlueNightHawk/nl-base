@@ -465,9 +465,6 @@
     <ClCompile Include="..\..\public\registry.cpp">
       <Filter>Source Files\nl\filesystem</Filter>
     </ClCompile>
-    <ClCompile Include="nlui_main.cpp">
-      <Filter>Source Files\nl\nlui_vanilla</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\cl_dll\nlui_chapterselect.cpp">
       <Filter>Source Files\nl\nlui_vanilla</Filter>
     </ClCompile>
@@ -512,6 +509,9 @@
     </ClCompile>
     <ClCompile Include="..\..\funchook\src\funchook.c">
       <Filter>Source Files\funchook</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\cl_dll\nlui_main.cpp">
+      <Filter>Source Files\nl\nlui_vanilla</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

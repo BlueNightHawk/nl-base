@@ -42,6 +42,8 @@
 #include "UserMessages.h"
 #include "client.h"
 
+#include <string>
+
 // #define DUCKFIX
 
 extern void CopyToBodyQue(entvars_t* pev);
@@ -751,6 +753,91 @@ void CBasePlayer::RemoveAllItems(bool removeSuit)
 		m_rgAmmo[i] = 0;
 
 	UpdateClientData();
+}
+
+extern char com_token[1500];
+extern char* COM_Parse(char* data);
+void CBasePlayer::SpawnChapterItems()
+{
+	char* afile,* pfile;
+	pfile = afile = (char *)LOAD_FILE_FOR_ME("resource/nlui/chapters.txt", 0);
+
+	if (!pfile)
+		return;
+
+	while (pfile = COM_Parse(pfile))
+	{
+		bool end = false;
+
+		if (!stricmp(com_token, "name"))
+		{
+			pfile = COM_Parse(pfile);
+			pfile = COM_Parse(pfile);
+
+			if (!stricmp(STRING(gpGlobals->mapname), com_token))
+			{
+				while (pfile = COM_Parse(pfile))
+				{
+					if (com_token[0] == '{')
+					{
+						while (pfile = COM_Parse(pfile))
+						{
+							if (!strnicmp("weapon_", com_token, 7))
+							{				
+								auto string = ALLOC_STRING(com_token);
+								GiveNamedItem(STRING(string));
+							}
+							if (!stricmp("battery", com_token))
+							{
+								pfile = COM_Parse(pfile);
+								pev->armorvalue = atoi(com_token);
+							}
+							if (!stricmp("health", com_token))
+							{
+								pfile = COM_Parse(pfile);
+								pev->health = atoi(com_token);
+							}
+							if (!strnicmp("ammo_", com_token, 5))
+							{
+								auto &p = m_rgAmmo[GetAmmoIndex(com_token + 5)];
+								pfile = COM_Parse(pfile);
+								p = atoi(com_token);
+							}
+							
+							if (!strnicmp("suit", com_token, 5))
+							{
+								SetHasSuit(true);
+							}
+
+							if (!strnicmp("longjump", com_token, 5))
+							{
+								m_fLongJump = true;
+							}
+
+							if (!strnicmp("yaw", com_token, 5))
+							{
+								pfile = COM_Parse(pfile);
+								pev->fixangle = 1;
+								pev->angles.y = atoi(com_token);
+							}
+
+							if (com_token[0] == '}')
+							{
+								end = true;
+								break;
+							}
+						}
+					}
+					if (end)
+						break;
+				}
+			}
+		}
+		if (end)
+			break;
+	}
+
+	FREE_FILE(afile);
 }
 
 /*
@@ -2872,6 +2959,8 @@ void CBasePlayer::Spawn()
 	m_flNextChatTime = gpGlobals->time;
 	
 	g_pGameRules->PlayerSpawn(this);
+
+	m_bSpawnWeapons = true;
 }
 
 
@@ -4213,6 +4302,33 @@ void CBasePlayer::UpdateClientData()
 
 	//Handled anything that needs resetting
 	m_bRestored = false;
+
+
+	if (m_bSpawnWeapons && gpGlobals->time > 0.3f)
+	{
+		gEvilImpulse101 = true;
+		SpawnChapterItems();
+		gEvilImpulse101 = false;
+
+		// HACK to open the elevator door in office complex
+		if (!stricmp(STRING(gpGlobals->mapname), "c1a2"))
+		{
+			edict_t* pentTarget = NULL;
+
+			while ((pentTarget = FIND_ENTITY_BY_TARGETNAME(pentTarget, "elestartmm")) != nullptr)
+			{
+				if (FNullEnt(pentTarget))
+					break;
+
+				CBaseEntity* pTarget = CBaseEntity::Instance(pentTarget);
+
+				if (pTarget)
+					pTarget->Use(m_hActivator, this, USE_TOGGLE, 0);
+			}
+		}
+
+		m_bSpawnWeapons = false;
+	}
 }
 
 

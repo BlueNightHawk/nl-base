@@ -17,7 +17,6 @@
 
 #include "pm_materials.h"
 
-
 #define PLAYER_FATAL_FALL_SPEED 1024															  // approx 60 feet
 #define PLAYER_MAX_SAFE_FALL_SPEED 580															  // approx 20 feet
 #define DAMAGE_FOR_FALL_SPEED (float)100 / (PLAYER_FATAL_FALL_SPEED - PLAYER_MAX_SAFE_FALL_SPEED) // damage per unit per second.
@@ -355,6 +354,10 @@ public:
 
 	//True if the player is currently spawning.
 	bool m_bIsSpawning = false;
+
+	void SpawnChapterItems();
+
+	bool m_bSpawnWeapons = false;
 };
 
 inline void CBasePlayer::SetWeaponBit(int id)

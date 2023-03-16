@@ -63,7 +63,7 @@ void CChapterSelect::Update()
 
 	ImVec2 ImVec2LastFramePos;
 	ImFont SmallFont = *ImGui::GetFont();
-	SmallFont.Scale = 0.8f;
+	SmallFont.Scale = 0.7f;
 
 	ImGui::Begin(GetStringByIndex(ChapterSelectString_ChapterSelect), &m_bOpen, ImGuiWindowFlags_NoResize | ImGuiWindowFlags_AlwaysAutoResize);
 
