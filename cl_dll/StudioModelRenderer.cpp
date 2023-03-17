@@ -57,6 +57,8 @@ int m_nPlayerGaitSequences[MAX_PLAYERS];
 // Global engine <-> studio model rendering code interface
 engine_studio_api_t IEngineStudio;
 
+#define DUMMY_INDEX -999999
+
 /////////////////////
 // Implementation of CStudioModelRenderer.h
 
@@ -985,6 +987,19 @@ void CStudioModelRenderer::StudioSetupBones()
 	{
 		QuaternionMatrix(q[i], bonematrix);
 
+		if (g_pCurrentViewModelInfo && g_pCurrentViewModelInfo->iCamBone == i)
+		{
+			if (m_pCurrentEntity->index == DUMMY_INDEX)
+			{
+				Matrix3x4_AnglesFromMatrix(bonematrix, m_vBaseAngle);
+			}
+			else if (m_pCurrentEntity == gEngfuncs.GetViewModel())
+			{
+				Matrix3x4_AnglesFromMatrix(bonematrix, g_pCurrentViewModelInfo->vCamAngle);
+				g_pCurrentViewModelInfo->vCamAngle = (g_pCurrentViewModelInfo->vCamAngle - m_vBaseAngle) * g_pCurrentViewModelInfo->flCamScale;
+			}
+		}
+
 		bonematrix[0][3] = pos[i][0];
 		bonematrix[1][3] = pos[i][1];
 		bonematrix[2][3] = pos[i][2];
@@ -1128,6 +1143,21 @@ void CStudioModelRenderer::StudioMergeBones(model_t* m_pSubModel)
 }
 
 
+void CStudioModelRenderer::StudioCalcCamAnimBaseAngle()
+{
+	m_DummyViewModel = *m_pCurrentEntity;
+	m_pCurrentEntity = &m_DummyViewModel;
+	m_pCurrentEntity->index = DUMMY_INDEX;
+	m_pCurrentEntity->curstate.frame = m_pCurrentEntity->curstate.sequence = 0;
+	m_pCurrentEntity->curstate.animtime = m_clTime;
+
+	StudioSetUpTransform(false);
+	StudioSetupBones();
+	StudioSaveBones();
+
+	m_pCurrentEntity = gEngfuncs.GetViewModel();
+}
+
 /*
 ====================
 StudioDrawModel
@@ -1180,6 +1210,32 @@ bool CStudioModelRenderer::StudioDrawModel(int flags)
 	m_pStudioHeader = (studiohdr_t*)IEngineStudio.Mod_Extradata(m_pRenderModel);
 	IEngineStudio.StudioSetHeader(m_pStudioHeader);
 	IEngineStudio.SetRenderModel(m_pRenderModel);
+
+	if (gEngfuncs.GetViewModel() == m_pCurrentEntity)
+	{
+		if (m_pPrevViewModel != m_pCurrentEntity->model)
+		{
+			auto &p = g_ViewModelInfoMap.find(m_pCurrentEntity->model->name);
+			if (p != g_ViewModelInfoMap.end())
+			{
+				g_pCurrentViewModelInfo = &p->second;
+			}
+			else
+			{
+				if (g_pCurrentViewModelInfo)
+					g_pCurrentViewModelInfo->vCamAngle = m_vBaseAngle = g_vecZero;
+	
+				g_pCurrentViewModelInfo = nullptr;
+			}
+		}
+
+		m_pPrevViewModel = m_pCurrentEntity->model;
+
+		if (g_pCurrentViewModelInfo)
+		{
+			StudioCalcCamAnimBaseAngle();
+		}
+	}
 
 	StudioSetUpTransform(false);
 
@@ -1636,7 +1692,9 @@ bool CStudioModelRenderer::StudioDrawPlayer(int flags, entity_state_t* pplayer)
 
 		if (bPlayerBody)
 		{
-			glEnable(GL_DEPTH_CLAMP);
+			if (r_drawlegs->value != 2)
+				glEnable(GL_DEPTH_CLAMP);
+	
 			glDepthRange(0.0f, 0.4f);
 			StudioRenderModel();
 			glDepthRange(0.0f, 1.0f);

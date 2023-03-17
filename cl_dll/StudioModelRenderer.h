@@ -184,6 +184,7 @@ public:
 	float (*m_pbonetransform)[MAXSTUDIOBONES][3][4];
 	float (*m_plighttransform)[MAXSTUDIOBONES][3][4];
 
+public:
 	// FULLBRIGHT START
 
 	bool StudioGetFullbright(model_s* pmodel);
@@ -194,5 +195,11 @@ public:
 	std::vector<std::string> m_szCheckedModels;
 	std::vector<std::string> m_szFullBrightModels;
 
+
+	model_s* m_pPrevViewModel;
 	// FULLBRIGHT END
+public:
+	Vector m_vBaseAngle;
+	void StudioCalcCamAnimBaseAngle();
+	cl_entity_t m_DummyViewModel;
 };

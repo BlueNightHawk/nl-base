@@ -19,12 +19,15 @@ void UnHookSdl();
 void ShutdownImgui();
 void ShutdownPresence();
 
+void ParseViewModelInfo();
+
 void NL_Init()
 {
 	InitGameUI();
 	HookSdl();
 	InitDiscord();
 	HWHook();
+	ParseViewModelInfo();
 
 	r_drawlegs = gEngfuncs.pfnRegisterVariable("r_drawlegs", "1", FCVAR_ARCHIVE);
 	cl_oldbob = gEngfuncs.pfnRegisterVariable("cl_oldbob", "0", FCVAR_ARCHIVE);

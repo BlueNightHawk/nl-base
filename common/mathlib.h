@@ -109,7 +109,8 @@ int InvertMatrix(const float* m, float* out);
 int BoxOnPlaneSide(const Vector& emins, const Vector& emaxs, struct mplane_s* plane);
 float anglemod(float a);
 
-
+void Matrix3x4_OriginFromMatrix(const float in[3][4], float* out);
+void Matrix3x4_AnglesFromMatrix(const float in[3][4], float* out);
 
 #define BOX_ON_PLANE_SIDE(emins, emaxs, p)                                                                 \
 	(((p)->type < 3) ? (                                                                                   \

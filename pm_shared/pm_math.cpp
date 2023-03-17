@@ -420,3 +420,32 @@ void ConcatTransforms(float in1[3][4], float in2[3][4], float out[3][4])
 	out[2][3] = in1[2][0] * in2[0][3] + in1[2][1] * in2[1][3] +
 				in1[2][2] * in2[2][3] + in1[2][3];
 }
+
+#define RAD2DEG(x) ((float)(x) * (float)(180.f / M_PI))
+
+void Matrix3x4_OriginFromMatrix(const float in[3][4], float* out)
+{
+	out[0] = in[0][3];
+	out[1] = in[1][3];
+	out[2] = in[2][3];
+}
+
+void Matrix3x4_AnglesFromMatrix(const float in[3][4], float *out)
+{
+	float xyDist = sqrt(in[0][0] * in[0][0] + in[1][0] * in[1][0]);
+
+	if (xyDist > 0.001f)
+	{
+		// enough here to get angles?
+		out[0] = RAD2DEG(atan2(-in[2][0], xyDist));
+		out[1] = RAD2DEG(atan2(in[1][0], in[0][0]));
+		out[2] = RAD2DEG(atan2(in[2][1], in[2][2]));
+	}
+	else
+	{
+		// forward is mostly Z, gimbal lock
+		out[0] = RAD2DEG(atan2(-in[2][0], xyDist));
+		out[1] = RAD2DEG(atan2(-in[0][1], in[1][1]));
+		out[2] = 0.0f;
+	}
+}

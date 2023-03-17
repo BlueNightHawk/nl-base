@@ -5,7 +5,7 @@
 #include <filesystem>
 #include <SDL.h>
 #include <SDL_video.h>
-
+#include "nlfuncs.h"
 
 static struct
 {
@@ -204,4 +204,50 @@ void gltexture_t::Scale()
 
 	width = original_width * std::clamp(scale, 0.52f, 20.0f);
 	height = original_height * std::clamp(scale, 0.52f, 20.0f);
+}
+
+std::map<string, viewmodelinfo_s> g_ViewModelInfoMap;
+viewmodelinfo_s* g_pCurrentViewModelInfo;
+
+void ParseViewModelInfo()
+{
+	static char token[512];
+	char *pfile, *afile;
+	pfile = afile = reinterpret_cast<char*>(gEngfuncs.COM_LoadFile("resource/nlui/caminfo.txt", 5, 0));
+
+	if (!pfile || !afile)
+		return;
+
+	while (pfile = gEngfuncs.COM_ParseFile(pfile, token))
+	{
+		if (!stricmp("name", token))
+		{
+			viewmodelinfo_s info;
+			pfile = gEngfuncs.COM_ParseFile(pfile, token);
+			info.name = token;
+			pfile = gEngfuncs.COM_ParseFile(pfile, token);
+			if (token[0] == '{')
+			{
+				while (pfile = gEngfuncs.COM_ParseFile(pfile, token))
+				{
+					if (token[0] == '}')
+						break;
+
+					if (!stricmp("cambone", token))
+					{
+						pfile = gEngfuncs.COM_ParseFile(pfile, token);
+						info.iCamBone = atoi(token);
+					}
+					else if (!stricmp("camscale", token))
+					{
+						pfile = gEngfuncs.COM_ParseFile(pfile, token);
+						info.flCamScale = atof(token);
+					}
+				}
+			}
+			g_ViewModelInfoMap.insert(std::make_pair(info.name, info));
+		}
+	}
+
+	gEngfuncs.COM_FreeFile(afile);
 }

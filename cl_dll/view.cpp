@@ -684,6 +684,28 @@ void V_JumpAngles(struct ref_params_s* pparams)
 	pparams->viewangles[0] -= v_jumpangle[0] * 0.5f;
 }
 
+void V_ApplyCamAngles(struct ref_params_s* pparams)
+{
+	static Vector camangle;
+
+	if (!g_pCurrentViewModelInfo || g_pCurrentViewModelInfo->iCamBone == -1)
+	{
+		for (int i = 0; i < 3; i++)
+		{
+			camangle[i] = lerp(camangle[i], 0, pparams->frametime * 17.0f);
+		}
+	}
+	else
+	{
+		for (int i = 0; i < 3; i++)
+		{
+			camangle[i] = lerp(camangle[i], g_pCurrentViewModelInfo->vCamAngle[i], pparams->frametime * 17.0f);
+		}
+	}
+
+	VectorAdd(pparams->viewangles, camangle, pparams->viewangles);
+}
+
 #define ORIGIN_BACKUP 64
 #define ORIGIN_MASK (ORIGIN_BACKUP - 1)
 
@@ -902,6 +924,7 @@ void V_CalcNormalRefdef(struct ref_params_s* pparams)
 	V_RetractWeapon(pparams);
 
 	V_CalcViewModelLag(pparams, view->origin, (Vector)pparams->cl_viewangles, pparams->cl_viewangles);
+	V_ApplyCamAngles(pparams);
 
 	V_PunchAngles(v_jumpangle, pparams->frametime, v_jumppunch);
 	V_JumpAngles(pparams);
