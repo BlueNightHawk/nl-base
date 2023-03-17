@@ -987,6 +987,10 @@ void CStudioModelRenderer::StudioSetupBones()
 	{
 		QuaternionMatrix(q[i], bonematrix);
 
+		bonematrix[0][3] = pos[i][0];
+		bonematrix[1][3] = pos[i][1];
+		bonematrix[2][3] = pos[i][2];
+
 		if (g_pCurrentViewModelInfo && g_pCurrentViewModelInfo->iCamBone == i)
 		{
 			if (m_pCurrentEntity->index == DUMMY_INDEX)
@@ -999,10 +1003,6 @@ void CStudioModelRenderer::StudioSetupBones()
 				g_pCurrentViewModelInfo->vCamAngle = (g_pCurrentViewModelInfo->vCamAngle - m_vBaseAngle) * g_pCurrentViewModelInfo->flCamScale;
 			}
 		}
-
-		bonematrix[0][3] = pos[i][0];
-		bonematrix[1][3] = pos[i][1];
-		bonematrix[2][3] = pos[i][2];
 
 		if (pbones[i].parent == -1)
 		{
@@ -1227,14 +1227,13 @@ bool CStudioModelRenderer::StudioDrawModel(int flags)
 	
 				g_pCurrentViewModelInfo = nullptr;
 			}
+			if (g_pCurrentViewModelInfo)
+			{
+				StudioCalcCamAnimBaseAngle();
+			}
 		}
 
 		m_pPrevViewModel = m_pCurrentEntity->model;
-
-		if (g_pCurrentViewModelInfo)
-		{
-			StudioCalcCamAnimBaseAngle();
-		}
 	}
 
 	StudioSetUpTransform(false);
@@ -1692,9 +1691,7 @@ bool CStudioModelRenderer::StudioDrawPlayer(int flags, entity_state_t* pplayer)
 
 		if (bPlayerBody)
 		{
-			if (r_drawlegs->value != 2)
-				glEnable(GL_DEPTH_CLAMP);
-	
+			glEnable(GL_DEPTH_CLAMP);
 			glDepthRange(0.0f, 0.4f);
 			StudioRenderModel();
 			glDepthRange(0.0f, 1.0f);
