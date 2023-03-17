@@ -4472,7 +4472,7 @@ Vector CBasePlayer::GetAutoaimVector(float flDelta)
 		if (m_vecAutoAim.x != m_lastx ||
 			m_vecAutoAim.y != m_lasty)
 		{
-			SET_CROSSHAIRANGLE(edict(), -m_vecAutoAim.x, m_vecAutoAim.y);
+			SetCrosshairAngle(-m_vecAutoAim.x, m_vecAutoAim.y);
 
 			m_lastx = m_vecAutoAim.x;
 			m_lasty = m_vecAutoAim.y;
@@ -4616,9 +4616,17 @@ void CBasePlayer::ResetAutoaim()
 	if (m_vecAutoAim.x != 0 || m_vecAutoAim.y != 0)
 	{
 		m_vecAutoAim = Vector(0, 0, 0);
-		SET_CROSSHAIRANGLE(edict(), 0, 0);
 	}
+	SetCrosshairAngle(0, 0);
 	m_fOnTarget = false;
+}
+
+void CBasePlayer::SetCrosshairAngle(float x, float y)
+{
+	MESSAGE_BEGIN(MSG_ONE, gmsgCrosshair, 0, pev);
+	WRITE_FLOAT(x);
+	WRITE_FLOAT(y);
+	MESSAGE_END();
 }
 
 /*

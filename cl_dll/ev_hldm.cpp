@@ -258,7 +258,7 @@ void EV_HLDM_GunshotDecalTrace(pmtrace_t* pTrace, char* decalName)
 	pe = gEngfuncs.pEventAPI->EV_GetPhysent(pTrace->ent);
 
 	// Only decal brush models such as the world etc.
-	if (decalName && '\0' != decalName[0] && pe && (pe->solid == SOLID_BSP || pe->movetype == MOVETYPE_PUSHSTEP))
+	if (decalName && '\0' != decalName[0] && pe && (pe->solid == SOLID_BSP || pe->movetype == MOVETYPE_PUSHSTEP || pe->movetype == MOVETYPE_PUSH))
 	{
 		if (CVAR_GET_FLOAT("r_decals"))
 		{
@@ -275,7 +275,7 @@ void EV_HLDM_DecalGunshot(pmtrace_t* pTrace, int iBulletType)
 
 	pe = gEngfuncs.pEventAPI->EV_GetPhysent(pTrace->ent);
 
-	if (pe && pe->solid == SOLID_BSP)
+	if (pe)
 	{
 		switch (iBulletType)
 		{
@@ -384,7 +384,7 @@ void EV_HLDM_FireBullets(int idx, float* forward, float* right, float* up, int c
 		gEngfuncs.pEventAPI->EV_SetSolidPlayers(idx - 1);
 
 		gEngfuncs.pEventAPI->EV_SetTraceHull(2);
-		gEngfuncs.pEventAPI->EV_PlayerTrace(vecSrc, vecEnd, PM_STUDIO_BOX, -1, &tr);
+		gEngfuncs.pEventAPI->EV_PlayerTrace(vecSrc, vecEnd, PM_NORMAL, -1, &tr);
 
 		EV_HLDM_CheckTracer(idx, vecSrc, tr.endpos, forward, right, iBulletType, iTracerFreq, tracerCount);
 
@@ -455,7 +455,8 @@ void EV_FireGlock1(event_args_t* args)
 		EV_MuzzleFlash();
 		gEngfuncs.pEventAPI->EV_WeaponAnimation(empty ? GLOCK_SHOOT_EMPTY : GLOCK_SHOOT, 0);
 
-		V_PunchAxis(0, -2.0);
+		V_PunchAxis(0, gEngfuncs.pfnRandomFloat(-0.5f,-1.0f));
+		V_PunchAxis(1, gEngfuncs.pfnRandomFloat(1.0f,-1.0f));
 	}
 
 	EV_GetDefaultShellInfo(args, origin, velocity, ShellVelocity, ShellOrigin, forward, right, up, 20, -12, 4);
@@ -501,7 +502,8 @@ void EV_FireGlock2(event_args_t* args)
 		EV_MuzzleFlash();
 		gEngfuncs.pEventAPI->EV_WeaponAnimation(empty ? GLOCK_SHOOT_EMPTY : GLOCK_SHOOT, 0);
 
-		V_PunchAxis(0, -2.0);
+		V_PunchAxis(0, gEngfuncs.pfnRandomFloat(-0.5f, -1.0f));
+		V_PunchAxis(1, gEngfuncs.pfnRandomFloat(1.0f, -1.0f));
 	}
 
 	EV_GetDefaultShellInfo(args, origin, velocity, ShellVelocity, ShellOrigin, forward, right, up, 20, -12, 4);
@@ -873,7 +875,7 @@ void EV_FireGauss(event_args_t* args)
 		gEngfuncs.pEventAPI->EV_SetSolidPlayers(idx - 1);
 
 		gEngfuncs.pEventAPI->EV_SetTraceHull(2);
-		gEngfuncs.pEventAPI->EV_PlayerTrace(vecSrc, vecDest, PM_STUDIO_BOX, -1, &tr);
+		gEngfuncs.pEventAPI->EV_PlayerTrace(vecSrc, vecDest, PM_NORMAL, -1, &tr);
 
 		gEngfuncs.pEventAPI->EV_PopPMStates();
 
@@ -992,7 +994,7 @@ void EV_FireGauss(event_args_t* args)
 					gEngfuncs.pEventAPI->EV_SetSolidPlayers(idx - 1);
 
 					gEngfuncs.pEventAPI->EV_SetTraceHull(2);
-					gEngfuncs.pEventAPI->EV_PlayerTrace(start, vecDest, PM_STUDIO_BOX, -1, &beam_tr);
+					gEngfuncs.pEventAPI->EV_PlayerTrace(start, vecDest, PM_NORMAL, -1, &beam_tr);
 
 					if (0 == beam_tr.allsolid)
 					{
@@ -1001,7 +1003,7 @@ void EV_FireGauss(event_args_t* args)
 
 						// trace backwards to find exit point
 
-						gEngfuncs.pEventAPI->EV_PlayerTrace(beam_tr.endpos, tr.endpos, PM_STUDIO_BOX, -1, &beam_tr);
+						gEngfuncs.pEventAPI->EV_PlayerTrace(beam_tr.endpos, tr.endpos, PM_NORMAL, -1, &beam_tr);
 
 						VectorSubtract(beam_tr.endpos, tr.endpos, delta);
 
@@ -1168,7 +1170,7 @@ void EV_FireCrossbow2(event_args_t* args)
 	// Now add in all of the players.
 	gEngfuncs.pEventAPI->EV_SetSolidPlayers(idx - 1);
 	gEngfuncs.pEventAPI->EV_SetTraceHull(2);
-	gEngfuncs.pEventAPI->EV_PlayerTrace(vecSrc, vecEnd, PM_STUDIO_BOX, -1, &tr);
+	gEngfuncs.pEventAPI->EV_PlayerTrace(vecSrc, vecEnd, PM_NORMAL, -1, &tr);
 
 	//We hit something
 	if (tr.fraction < 1.0)
@@ -1352,7 +1354,7 @@ void EV_EgonFire(event_args_t* args)
 			gEngfuncs.pEventAPI->EV_SetSolidPlayers(idx - 1);
 
 			gEngfuncs.pEventAPI->EV_SetTraceHull(2);
-			gEngfuncs.pEventAPI->EV_PlayerTrace(vecSrc, vecEnd, PM_STUDIO_BOX, -1, &tr);
+			gEngfuncs.pEventAPI->EV_PlayerTrace(vecSrc, vecEnd, PM_NORMAL, -1, &tr);
 
 			gEngfuncs.pEventAPI->EV_PopPMStates();
 

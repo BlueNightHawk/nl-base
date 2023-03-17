@@ -1,5 +1,6 @@
 #include "PlatformHeaders.h"
 #include "cl_dll.h"
+#include "cvardef.h"
 #include "cdll_int.h"
 #include "nlfuncs.h"
 #include "hldiscord.h"
@@ -7,6 +8,10 @@
 #include "reGS.h"
 
 funchook_t* g_Hook;
+
+cvar_t* r_drawlegs = nullptr;
+cvar_t* cl_oldbob = nullptr;
+cvar_t* cl_camerabob = nullptr;
 
 void HookSdl();
 void UnHookSdl();
@@ -20,6 +25,10 @@ void NL_Init()
 	HookSdl();
 	InitDiscord();
 	HWHook();
+
+	r_drawlegs = gEngfuncs.pfnRegisterVariable("r_drawlegs", "1", FCVAR_ARCHIVE);
+	cl_oldbob = gEngfuncs.pfnRegisterVariable("cl_oldbob", "0", FCVAR_ARCHIVE);
+	cl_camerabob = gEngfuncs.pfnRegisterVariable("cl_camerabob", "1", FCVAR_ARCHIVE);
 
 	funchook_install(g_Hook, 0);
 

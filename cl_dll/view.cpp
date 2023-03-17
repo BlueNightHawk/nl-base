@@ -19,7 +19,10 @@
 #include "shake.h"
 #include "hltv.h"
 #include "Exports.h"
-
+#include "nlfuncs.h"
+#include <algorithm>
+#include <cmath>
+#include "nlui_utils.h"
 
 ref_params_s g_refparams;
 
@@ -42,6 +45,7 @@ extern float vJumpAngles[3];
 
 void V_DropPunchAngle(float frametime, float* ev_punchangle);
 void VectorAngles(const float* forward, float* angles);
+void V_PunchAngles(float* ev_punchangle, float frametime, float* punch);
 
 #include "r_studioint.h"
 #include "com_model.h"
@@ -100,6 +104,8 @@ cvar_t v_ipitch_cycle = {"v_ipitch_cycle", "1", 0, 1};
 cvar_t v_iyaw_level = {"v_iyaw_level", "0.3", 0, 0.3};
 cvar_t v_iroll_level = {"v_iroll_level", "0.1", 0, 0.1};
 cvar_t v_ipitch_level = {"v_ipitch_level", "0.3", 0, 0.3};
+
+Vector v_jumpangle, v_jumppunch;
 
 float v_idlescale; // used by TFC for concussion grenade effect
 
@@ -160,6 +166,74 @@ void V_InterpolateAngles( float *start, float *end, float *output, float frac )
 
 	V_NormalizeAngles( output );
 } */
+
+enum calcBobMode_t
+{
+	VB_COS,
+	VB_SIN,
+	VB_COS2,
+	VB_SIN2
+};
+
+// Quakeworld bob code, this fixes jitters in the mutliplayer since the clock (pparams->time) isn't quite linear
+void V_CalcBob(struct ref_params_s* pparams, float freqmod, calcBobMode_t mode, double& bobtime, float& bob, float& lasttime)
+{
+	float cycle;
+	Vector vel;
+
+
+	if (pparams->onground == 0)
+	{
+		bob = lerp(bob, 0, pparams->frametime * 10.0f);
+		return;
+	}
+
+	if (pparams->time == lasttime)
+	{
+		// just use old value
+		return; // bob;
+	}
+
+	float prevbob = bob;
+
+	lasttime = pparams->time;
+
+	bobtime += pparams->frametime * freqmod;
+	cycle = bobtime - (int)(bobtime / cl_bobcycle->value) * cl_bobcycle->value;
+	cycle /= cl_bobcycle->value;
+
+	if (cycle < cl_bobup->value)
+	{
+		cycle = M_PI * cycle / cl_bobup->value;
+	}
+	else
+	{
+		cycle = M_PI + M_PI * (cycle - cl_bobup->value) / (1.0 - cl_bobup->value);
+	}
+
+	// bob is proportional to simulated velocity in the xy plane
+	// (don't count Z, or jumping messes it up)
+	VectorCopy(pparams->simvel, vel);
+	vel[2] = 0;
+
+	bob = sqrt(vel[0] * vel[0] + vel[1] * vel[1]) * cl_bob->value;
+
+	if (mode == VB_SIN)
+		bob = bob * 0.3 + bob * 0.7 * sin(cycle);
+	else if (mode == VB_COS)
+		bob = bob * 0.3 + bob * 0.7 * cos(cycle);
+	else if (mode == VB_SIN2)
+		bob = bob * 0.3 + bob * 0.7 * sin(cycle) * sin(cycle);
+	else if (mode == VB_COS2)
+		bob = bob * 0.3 + bob * 0.7 * cos(cycle) * cos(cycle);
+
+	bob = V_min(bob, 4);
+	bob = V_max(bob, -7);
+
+	bob = lerp(prevbob, bob, pparams->frametime * 17.0f);
+	// return bob;
+}
+
 
 // Quakeworld bob code, this fixes jitters in the mutliplayer since the clock (pparams->time) isn't quite linear
 float V_CalcBob(struct ref_params_s* pparams)
@@ -369,6 +443,11 @@ void V_CalcGunAngle(struct ref_params_s* pparams)
 	if (!viewent)
 		return;
 
+	for (int i = 0; i < 3; i++)
+	{
+		pparams->crosshairangle[i] = lerp(pparams->crosshairangle[i], gHUD.m_vCrosshairAngle[i], pparams->frametime * 10.0f);
+	}
+
 	viewent->angles[YAW] = pparams->viewangles[YAW] + pparams->crosshairangle[YAW];
 	viewent->angles[PITCH] = -pparams->viewangles[PITCH] + pparams->crosshairangle[PITCH] * 0.25;
 	viewent->angles[ROLL] -= v_idlescale * sin(pparams->time * v_iroll_cycle.value) * v_iroll_level.value;
@@ -405,14 +484,14 @@ Roll is induced by movement and damage
 */
 void V_CalcViewRoll(struct ref_params_s* pparams)
 {
-	float side;
+	static float side = 0.0f;
 	cl_entity_t* viewentity;
 
 	viewentity = gEngfuncs.GetEntityByIndex(pparams->viewentity);
 	if (!viewentity)
 		return;
 
-	side = V_CalcRoll(viewentity->angles, pparams->simvel, cl_rollangle->value, cl_rollspeed->value);
+	side = lerp(side, V_CalcRoll(viewentity->angles, pparams->simvel, cl_rollangle->value, cl_rollspeed->value), pparams->frametime * 15.0f);
 
 	pparams->viewangles[ROLL] += side;
 
@@ -468,6 +547,143 @@ void V_CalcIntermissionRefdef(struct ref_params_s* pparams)
 	v_angles = pparams->viewangles;
 }
 
+float m_flWeaponLag = 4.5f;
+
+void V_CalcViewModelLag(ref_params_t* pparams, Vector& origin, Vector& angles, Vector original_angles)
+{
+	static Vector m_vecLastFacing;
+	Vector vOriginalOrigin = origin;
+	Vector vOriginalAngles = angles;
+
+	// Calculate our drift
+	Vector forward, right, up;
+	AngleVectors(angles, forward, right, up);
+
+	if (pparams->frametime != 0.0f) // not in paused
+	{
+		Vector vDifference;
+
+		vDifference = forward - m_vecLastFacing;
+
+		float flSpeed = 7.0f;
+
+		// If we start to lag too far behind, we'll increase the "catch up" speed.
+		// Solves the problem with fast cl_yawspeed, m_yaw or joysticks rotating quickly.
+		// The old code would slam lastfacing with origin causing the viewmodel to pop to a new position
+		float flDiff = vDifference.Length();
+		if ((flDiff > m_flWeaponLag) && (m_flWeaponLag > 0.0f))
+		{
+			float flScale = flDiff / m_flWeaponLag;
+			flSpeed *= flScale;
+		}
+
+		// FIXME:  Needs to be predictable?
+		m_vecLastFacing = m_vecLastFacing + vDifference * (flSpeed * pparams->frametime);
+		// Make sure it doesn't grow out of control!!!
+		m_vecLastFacing = m_vecLastFacing.Normalize();
+		origin = origin + (vDifference * -1.0f) * 3.0f;
+	}
+
+	AngleVectors(original_angles, forward, right, up);
+
+	float pitch = original_angles[PITCH];
+
+	if (pitch > 180.0f)
+	{
+		pitch -= 360.0f;
+	}
+	else if (pitch < -180.0f)
+	{
+		pitch += 360.0f;
+	}
+
+	if (m_flWeaponLag <= 0.0f)
+	{
+		origin = vOriginalOrigin;
+		angles = vOriginalAngles;
+	}
+	else
+	{
+		// FIXME: These are the old settings that caused too many exposed polys on some models
+		origin = origin + forward * (-pitch * 0.035f);
+		origin = origin + right * (-pitch * 0.03f);
+		origin = origin + up * (-pitch * 0.02f);
+	}
+}
+
+void V_RetractWeapon(struct ref_params_s *pparams)
+{
+	static float flRetractAmt = 0.0f;
+	float flFraction = 1.0f;
+
+	cl_entity_s* view = gEngfuncs.GetViewModel();
+
+	Vector vecSrc = pparams->vieworg;
+	Vector vecDir = pparams->forward;
+	Vector vecEnd = vecSrc + (vecDir * 50);
+
+	pmtrace_t tr;
+	gEngfuncs.pEventAPI->EV_PushPMStates();
+	gEngfuncs.pEventAPI->EV_SetTraceHull(2);
+	gEngfuncs.pEventAPI->EV_SetSolidPlayers(pparams->viewentity - 1);
+	gEngfuncs.pEventAPI->EV_PlayerTrace(vecSrc, vecEnd, PM_NORMAL, -1, &tr);
+	gEngfuncs.pEventAPI->EV_PopPMStates();
+
+	flFraction -= tr.fraction;
+
+	flRetractAmt = lerp(flRetractAmt, flFraction, pparams->frametime * 10.0f);
+
+	view->origin = view->origin - vecDir * (flRetractAmt * 8.0f);
+	view->angles[0] += flRetractAmt * 8.0f;
+}
+
+void V_JumpAngles(struct ref_params_s* pparams)
+{
+	extern kbutton_t in_jump;
+	static int iJumpStage = 0;
+
+	static float flFallDist = 0.0f;
+
+	cl_entity_s* view = gEngfuncs.GetViewModel();
+	auto pl = gEngfuncs.GetLocalPlayer();
+
+
+	if (iJumpStage == 0)
+	{
+		flFallDist = lerp(flFallDist, 0, pparams->frametime * 17.0f);
+	}
+	if (pl->curstate.movetype != MOVETYPE_WALK || pparams->waterlevel != 0.0f || (iJumpStage == 0 && pparams->onground != 0))
+	{
+		iJumpStage = 0;
+	}
+	else if (iJumpStage == 0 && (in_jump.state & 1) != 0)
+	{
+		iJumpStage = 1;
+	}
+	else if (iJumpStage == 0 && pparams->onground == 0)
+	{
+		iJumpStage = 2;
+	}
+	else if (iJumpStage > 0 && pparams->onground != 0)
+	{
+		v_jumppunch = Vector(-3, 3, 0) * 20.0f;
+		iJumpStage = 0;
+	}
+	else if (iJumpStage == 1)
+	{
+		v_jumppunch = Vector(-4, 4, 0) * 20.0f;
+		iJumpStage = 2;
+	}
+	else if (iJumpStage == 2)
+	{
+		flFallDist += pparams->frametime * 5.0f;
+		flFallDist = V_min(flFallDist, 10.0f);
+	}
+
+	view->angles = view->angles + v_jumpangle + Vector(flFallDist,-flFallDist,0);
+	pparams->viewangles[0] -= v_jumpangle[0] * 0.5f;
+}
+
 #define ORIGIN_BACKUP 64
 #define ORIGIN_MASK (ORIGIN_BACKUP - 1)
 
@@ -503,6 +719,13 @@ void V_CalcNormalRefdef(struct ref_params_s* pparams)
 	Vector camAngles, camForward, camRight, camUp;
 	cl_entity_t* pwater;
 
+	static float bobRight = 0, bobUp = 0;
+
+    static double bobtimes[2] = {0, 0};
+	static float lasttimes[2] = {0, 0};
+
+	static Vector viewheight = VEC_VIEW;
+
 	V_DriftPitch(pparams);
 
 	if (0 != gEngfuncs.IsSpectateOnly())
@@ -518,14 +741,37 @@ void V_CalcNormalRefdef(struct ref_params_s* pparams)
 	// view is the weapon model (only visible from inside body )
 	view = gEngfuncs.GetViewModel();
 
-	// transform the view offset by the model's matrix to get the offset from
-	// model origin for the view
-	bob = V_CalcBob(pparams);
+	// interpolate
+	if (pparams->viewheight[2] == 28.0f && viewheight[2] < 28.0f)
+	{
+		viewheight[2] += pparams->frametime * 250.0f;
+		if (viewheight[2] > 28.0f)
+			viewheight[2] = 28.0f;
+	}
+	else
+	{
+		viewheight[2] = pparams->viewheight[2];
+	}
+
+	if (cl_oldbob->value != 0.0f)
+	{
+		// transform the view offset by the model's matrix to get the offset from
+		// model origin for the view
+		bob = V_CalcBob(pparams);
+	}
+	else
+	{
+		// transform the view offset by the model's matrix to get the offset from
+		// model origin for the view
+		V_CalcBob(pparams, 0.75f, VB_SIN, bobtimes[0], bobRight, lasttimes[0]);	  // right
+		V_CalcBob(pparams, 1.50f, VB_SIN, bobtimes[1], bobUp, lasttimes[1]);	  // up
+	}
 
 	// refresh position
 	VectorCopy(pparams->simorg, pparams->vieworg);
-	pparams->vieworg[2] += (bob);
-	VectorAdd(pparams->vieworg, pparams->viewheight, pparams->vieworg);
+	if (cl_oldbob->value != 0.0f)
+		pparams->vieworg[2] += (bob);
+	VectorAdd(pparams->vieworg, viewheight, pparams->vieworg);
 
 	VectorCopy(pparams->cl_viewangles, pparams->viewangles);
 
@@ -648,24 +894,53 @@ void V_CalcNormalRefdef(struct ref_params_s* pparams)
 	// Use predicted origin as view origin.
 	VectorCopy(pparams->simorg, view->origin);
 	view->origin[2] += (waterOffset);
-	VectorAdd(view->origin, pparams->viewheight, view->origin);
+	VectorAdd(view->origin, viewheight, view->origin);
 
 	// Let the viewmodel shake at about 10% of the amplitude
 	gEngfuncs.V_ApplyShake(view->origin, view->angles, 0.9);
 
-	for (i = 0; i < 3; i++)
+	V_RetractWeapon(pparams);
+
+	V_CalcViewModelLag(pparams, view->origin, (Vector)pparams->cl_viewangles, pparams->cl_viewangles);
+
+	V_PunchAngles(v_jumpangle, pparams->frametime, v_jumppunch);
+	V_JumpAngles(pparams);
+
+	VectorCopy(view->angles, view->curstate.angles);
+
+	if (cl_oldbob->value != 0.0f)
 	{
-		view->origin[i] += bob * 0.4 * pparams->forward[i];
+		for (i = 0; i < 3; i++)
+		{
+			view->origin[i] += bob * 0.4 * pparams->forward[i];
+		}
+		view->origin[2] += bob;
+
+		// throw in a little tilt.
+		view->angles[YAW] -= bob * 0.5;
+		view->angles[ROLL] -= bob * 1;
+		view->angles[PITCH] -= bob * 0.3;
+
+		if (0 != cl_bobtilt->value)
+		{
+			VectorCopy(view->angles, view->curstate.angles);
+		}
 	}
-	view->origin[2] += bob;
-
-	// throw in a little tilt.
-	view->angles[YAW] -= bob * 0.5;
-	view->angles[ROLL] -= bob * 1;
-	view->angles[PITCH] -= bob * 0.3;
-
-	if (0 != cl_bobtilt->value)
+	else
 	{
+		for (i = 0; i < 3; i++)
+		{
+			pparams->vieworg[i] += bobRight * 0.33f * pparams->right[i];
+			view->origin[i] -= bobUp * 0.13f * pparams->up[i];
+		}
+
+		if (cl_camerabob)
+		{
+			pparams->viewangles[0] += bobUp * 0.07f;
+			pparams->viewangles[1] += bobRight * 0.13f;
+		}
+
+		view->angles[1] += bobRight * 0.13f;
 		VectorCopy(view->angles, view->curstate.angles);
 	}
 
@@ -1678,6 +1953,41 @@ void V_DropPunchAngle(float frametime, float* ev_punchangle)
 	len -= (10.0 + len * 0.5) * frametime;
 	len = V_max(len, 0.0);
 	VectorScale(ev_punchangle, len, ev_punchangle);
+}
+
+/*
+=============
+PLut Client Punch From HL2
+=============
+*/
+#define PUNCH_DAMPING 9.0f // bigger number makes the response more damped, smaller is less damped
+// currently the system will overshoot, with larger damping values it won't
+#define PUNCH_SPRING_CONSTANT 65.0f // bigger number increases the speed at which the view corrects
+
+void V_PunchAngles(float* ev_punchangle, float frametime, float *punch)
+{
+	float damping;
+	float springForceMagnitude;
+
+	if (Length(ev_punchangle) > 0.001 || Length(punch) > 0.001)
+	{
+		VectorMA(ev_punchangle, frametime, punch, ev_punchangle);
+		damping = 1 - (PUNCH_DAMPING * frametime);
+
+		if (damping < 0)
+		{
+			damping = 0;
+		}
+		VectorScale(punch, damping, punch);
+
+
+		// torsional spring
+		// UNDONE: Per-axis spring constant?
+		springForceMagnitude = PUNCH_SPRING_CONSTANT * frametime;
+		springForceMagnitude = std::clamp(springForceMagnitude, 0.0f, 2.0f);
+
+		VectorMA(punch, -springForceMagnitude, ev_punchangle, punch);
+	}
 }
 
 /*

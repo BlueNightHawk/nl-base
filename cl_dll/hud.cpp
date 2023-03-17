@@ -132,6 +132,11 @@ int __MsgFunc_GameMode(const char* pszName, int iSize, void* pbuf)
 	return static_cast<int>(gHUD.MsgFunc_GameMode(pszName, iSize, pbuf));
 }
 
+int __MsgFunc_Crosshair(const char* pszName, int iSize, void* pbuf)
+{
+	return static_cast<int>(gHUD.MsgFunc_Crosshair(pszName, iSize, pbuf));
+}
+
 // TFFree Command Menu
 void __CmdFunc_OpenCommandMenu()
 {
@@ -317,6 +322,8 @@ void CHud::Init()
 
 	// VGUI Menus
 	HOOK_MESSAGE(VGUIMenu);
+
+	HOOK_MESSAGE(Crosshair);
 
 	CVAR_CREATE("hud_classautokill", "1", FCVAR_ARCHIVE | FCVAR_USERINFO); // controls whether or not to suicide immediately on TF class switch
 	CVAR_CREATE("hud_takesshots", "0", FCVAR_ARCHIVE);					   // controls whether or not to automatically take screenshots at the end of a round

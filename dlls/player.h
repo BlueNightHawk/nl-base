@@ -358,6 +358,8 @@ public:
 	void SpawnChapterItems();
 
 	bool m_bSpawnWeapons = false;
+
+	void SetCrosshairAngle(float x, float y);
 };
 
 inline void CBasePlayer::SetWeaponBit(int id)

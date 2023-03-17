@@ -149,3 +149,13 @@ bool CHud::MsgFunc_Weapons(const char* pszName, int iSize, void* pbuf)
 
 	return true;
 }
+
+bool CHud::MsgFunc_Crosshair(const char* pszName, int iSize, void* pbuf)
+{
+	BEGIN_READ(pbuf, iSize);
+
+	m_vCrosshairAngle.x = READ_FLOAT();
+	m_vCrosshairAngle.y = READ_FLOAT();
+
+	return true;
+}

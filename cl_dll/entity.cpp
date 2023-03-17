@@ -14,6 +14,11 @@
 #include "pm_shared.h"
 #include "Exports.h"
 
+#include "PlatformHeaders.h"
+#include <SDL_opengl.h>
+
+#include "nlfuncs.h"
+
 #include "particleman.h"
 extern IParticleMan* g_pParticleMan;
 
@@ -309,6 +314,10 @@ void DLLEXPORT HUD_CreateEntities()
 	// Add in any game specific objects
 	Game_AddObjects();
 
+	glClearColor(0, 0, 0, 1);
+	glClear(GL_COLOR_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
+
+
 	GetClientVoiceMgr()->CreateEntities();
 }
 
@@ -325,26 +334,26 @@ void DLLEXPORT HUD_StudioEvent(const struct mstudioevent_s* event, const struct 
 {
 	//	RecClStudioEvent(event, entity);
 
-	bool iMuzzleFlash = true;
+	int iMuzzleFlash = 0;
 
 
 	switch (event->event)
 	{
 	case 5001:
-		if (iMuzzleFlash)
-			gEngfuncs.pEfxAPI->R_MuzzleFlash((float*)&entity->attachment[0], atoi(event->options));
+		gEngfuncs.pEfxAPI->R_MuzzleFlash((float*)&entity->attachment[0], atoi(event->options));
+		iMuzzleFlash = 1;
 		break;
 	case 5011:
-		if (iMuzzleFlash)
-			gEngfuncs.pEfxAPI->R_MuzzleFlash((float*)&entity->attachment[1], atoi(event->options));
+		gEngfuncs.pEfxAPI->R_MuzzleFlash((float*)&entity->attachment[1], atoi(event->options));
+		iMuzzleFlash = 2;
 		break;
 	case 5021:
-		if (iMuzzleFlash)
-			gEngfuncs.pEfxAPI->R_MuzzleFlash((float*)&entity->attachment[2], atoi(event->options));
+		gEngfuncs.pEfxAPI->R_MuzzleFlash((float*)&entity->attachment[2], atoi(event->options));
+		iMuzzleFlash = 3;
 		break;
 	case 5031:
-		if (iMuzzleFlash)
-			gEngfuncs.pEfxAPI->R_MuzzleFlash((float*)&entity->attachment[3], atoi(event->options));
+		gEngfuncs.pEfxAPI->R_MuzzleFlash((float*)&entity->attachment[3], atoi(event->options));
+		iMuzzleFlash = 4;
 		break;
 	case 5002:
 		gEngfuncs.pEfxAPI->R_SparkEffect((float*)&entity->attachment[0], atoi(event->options), -100, 100);
@@ -355,6 +364,19 @@ void DLLEXPORT HUD_StudioEvent(const struct mstudioevent_s* event, const struct 
 		break;
 	default:
 		break;
+	}
+
+	if (iMuzzleFlash > 0)
+	{
+		dlight_t* dl = gEngfuncs.pEfxAPI->CL_AllocDlight(entity->index + 2048);
+		if (dl)
+		{
+			dl->origin = entity->attachment[iMuzzleFlash - 1];
+			dl->radius = gEngfuncs.pfnRandomFloat(100, 200);
+			dl->die = gEngfuncs.GetClientTime() + 0.1f;
+			dl->color = {128, 128, 0};
+			dl->decay = 512;
+		}
 	}
 }
 
@@ -387,6 +409,11 @@ void DLLEXPORT HUD_TempEntUpdate(
 
 	if (g_pParticleMan)
 		g_pParticleMan->SetVariables(cl_gravity, vAngles);
+
+	if (r_drawlegs->value != 0.0f)
+	{
+		Callback_AddVisibleEntity(gEngfuncs.GetLocalPlayer());
+	}
 
 	// Nothing to simulate
 	if (!*ppTempEntActive)
@@ -683,7 +710,6 @@ void DLLEXPORT HUD_TempEntUpdate(
 				}
 			}
 
-
 			if ((pTemp->flags & FTENT_FLICKER) != 0 && gTempEntFrame == pTemp->entity.curstate.effects)
 			{
 				dlight_t* dl = gEngfuncs.pEfxAPI->CL_AllocDlight(0);
@@ -700,11 +726,18 @@ void DLLEXPORT HUD_TempEntUpdate(
 				gEngfuncs.pEfxAPI->R_RocketTrail(pTemp->entity.prevstate.origin, pTemp->entity.origin, 1);
 			}
 
-			if ((pTemp->flags & FTENT_GRAVITY) != 0)
-				pTemp->entity.baseline.origin[2] += gravity;
-			else if ((pTemp->flags & FTENT_SLOWGRAVITY) != 0)
-				pTemp->entity.baseline.origin[2] += gravitySlow;
-
+			if (gEngfuncs.PM_PointContents(pTemp->entity.origin, 0) == CONTENTS_WATER)
+			{
+				pTemp->entity.baseline.origin[2] -= g_refparams.frametime;
+				pTemp->entity.baseline.origin[2] = V_min(pTemp->entity.baseline.origin[2], 5);
+			}
+			else
+			{
+				if ((pTemp->flags & FTENT_GRAVITY) != 0)
+					pTemp->entity.baseline.origin[2] += gravity;
+				else if ((pTemp->flags & FTENT_SLOWGRAVITY) != 0)
+					pTemp->entity.baseline.origin[2] += gravitySlow;
+			}
 			if ((pTemp->flags & FTENT_CLIENTCUSTOM) != 0)
 			{
 				if (pTemp->callback)

@@ -607,6 +607,8 @@ public:
 	bool MsgFunc_Concuss(const char* pszName, int iSize, void* pbuf);
 	bool MsgFunc_Weapons(const char* pszName, int iSize, void* pbuf);
 
+	bool MsgFunc_Crosshair(const char* pszName, int iSize, void* pbuf);
+
 	// Screen information
 	SCREENINFO m_scrinfo;
 
@@ -621,6 +623,8 @@ public:
 	void AddHudElem(CHudBase* p);
 
 	float GetSensitivity();
+
+	Vector m_vCrosshairAngle;
 };
 
 extern CHud gHUD;

@@ -21,7 +21,28 @@
 #include "StudioModelRenderer.h"
 #include "GameStudioModelRenderer.h"
 
+#include "Exports.h"
+#include "PlatformHeaders.h"
+#include <SDL_opengl.h>
+#include <algorithm>
+#include <cmath>
+#include "nlfuncs.h"
+
+// FULLBRIGHT START
+
+#include <string>
+#include <iostream>
+#include <vector>
+
+#define GL_CLAMP_TO_EDGE 0x812F
+
+static GLuint g_iBlankTex = 0;
+
+// FULLBRIGHT END
+
 extern cvar_t* tfc_newmodels;
+
+void NormalizeAngles(float* angles);
 
 extern extra_player_info_t g_PlayerExtraInfo[MAX_PLAYERS_HUD + 1];
 
@@ -47,6 +68,9 @@ Init
 */
 void CStudioModelRenderer::Init()
 {
+	// FULLBRIGHT START
+	StudioCacheFullbrightNames();
+	// FULLBRIGHT END
 	// Set up some variables shared with engine
 	m_pCvarHiModels = IEngineStudio.GetCvar("cl_himodels");
 	m_pCvarDeveloper = IEngineStudio.GetCvar("developer");
@@ -1213,7 +1237,54 @@ bool CStudioModelRenderer::StudioDrawModel(int flags)
 
 		IEngineStudio.StudioSetRemapColors(m_nTopColor, m_nBottomColor);
 
-		StudioRenderModel();
+		if (m_pCurrentEntity == gEngfuncs.GetViewModel())
+		{
+			glEnable(GL_DEPTH_CLAMP);
+			glDepthRange(0.0f, 0.01f);
+
+			if (!StudioGetFullbright(m_pRenderModel))
+			{
+				lighting.plightvec = dir;
+				IEngineStudio.StudioDynamicLight(m_pCurrentEntity, &lighting);
+
+				IEngineStudio.StudioEntityLight(&lighting);
+
+				// model and frame independant
+				IEngineStudio.StudioSetupLighting(&lighting);
+
+				// get remap colors
+				StudioRenderModel();
+			}
+			else
+			{
+				StudioRenderEntity(false);
+				StudioRenderEntity(true);
+			}
+
+			glDepthRange(0.0f, 1.0f);
+			glDisable(GL_DEPTH_CLAMP);
+		}
+		else
+		{
+			if (!StudioGetFullbright(m_pRenderModel))
+			{
+				lighting.plightvec = dir;
+				IEngineStudio.StudioDynamicLight(m_pCurrentEntity, &lighting);
+
+				IEngineStudio.StudioEntityLight(&lighting);
+
+				// model and frame independant
+				IEngineStudio.StudioSetupLighting(&lighting);
+
+				// get remap colors
+				StudioRenderModel();
+			}
+			else
+			{
+				StudioRenderEntity(false);
+				StudioRenderEntity(true);
+			}
+		}
 	}
 
 	return true;
@@ -1245,8 +1316,8 @@ void CStudioModelRenderer::StudioEstimateGait(entity_state_t* pplayer)
 	// VectorAdd( pplayer->velocity, pplayer->prediction_error, est_velocity );
 	if (m_fGaitEstimation)
 	{
-		VectorSubtract(m_pCurrentEntity->origin, m_pPlayerInfo->prevgaitorigin, est_velocity);
-		VectorCopy(m_pCurrentEntity->origin, m_pPlayerInfo->prevgaitorigin);
+		VectorSubtract(m_pCurrentEntity->curstate.origin, m_pPlayerInfo->prevgaitorigin, est_velocity);
+		VectorCopy(m_pCurrentEntity->curstate.origin, m_pPlayerInfo->prevgaitorigin);
 		m_flGaitMovement = Length(est_velocity);
 		if (dt <= 0 || m_flGaitMovement / dt < 5)
 		{
@@ -1412,8 +1483,27 @@ bool CStudioModelRenderer::StudioDrawPlayer(int flags, entity_state_t* pplayer)
 	if (m_nPlayerIndex < 0 || m_nPlayerIndex >= gEngfuncs.GetMaxClients())
 		return false;
 
+	bool bPlayerBody = (m_pCurrentEntity == gEngfuncs.GetLocalPlayer() && !CL_IsThirdPerson()) ? true : false;
 
-	m_pRenderModel = IEngineStudio.SetupPlayerModel(m_nPlayerIndex);
+	if (bPlayerBody)
+	{
+		Vector angles;
+		gEngfuncs.GetViewAngles(angles);
+
+		if (angles[0] < 0 || g_refparams.waterlevel != 0)
+			return false;
+
+		if (gHUD.HasSuit())
+		{
+			m_pRenderModel = IEngineStudio.Mod_ForName("models/player_body.mdl", 0);
+		}
+		else
+		{
+			m_pRenderModel = IEngineStudio.Mod_ForName("models/playersci_body.mdl", 0);
+		}
+	}
+	else
+		m_pRenderModel = IEngineStudio.SetupPlayerModel(m_nPlayerIndex);
 
 
 	if (m_pRenderModel == NULL)
@@ -1422,6 +1512,17 @@ bool CStudioModelRenderer::StudioDrawPlayer(int flags, entity_state_t* pplayer)
 	m_pStudioHeader = (studiohdr_t*)IEngineStudio.Mod_Extradata(m_pRenderModel);
 	IEngineStudio.StudioSetHeader(m_pStudioHeader);
 	IEngineStudio.SetRenderModel(m_pRenderModel);
+
+	if (bPlayerBody)
+	{
+		Vector angles, forward;
+		gEngfuncs.GetViewAngles(angles);
+		angles[0] = 0;
+		AngleVectors(angles, forward, nullptr, nullptr);
+
+		m_pCurrentEntity->angles.x = 0;
+		m_pCurrentEntity->origin = m_pCurrentEntity->origin - forward * 19.5f;
+	}
 
 	if (0 != pplayer->gaitsequence)
 	{
@@ -1475,7 +1576,7 @@ bool CStudioModelRenderer::StudioDrawPlayer(int flags, entity_state_t* pplayer)
 
 	m_pPlayerInfo = NULL;
 
-	if ((flags & STUDIO_EVENTS) != 0)
+	if ((flags & STUDIO_EVENTS) != 0 && !bPlayerBody)
 	{
 		StudioCalcAttachments();
 		IEngineStudio.StudioClientEvents();
@@ -1486,6 +1587,11 @@ bool CStudioModelRenderer::StudioDrawPlayer(int flags, entity_state_t* pplayer)
 
 			memcpy(ent->attachment, m_pCurrentEntity->attachment, sizeof(Vector) * 4);
 		}
+	}
+
+	if (bPlayerBody)
+	{
+		m_pCurrentEntity->origin = m_pCurrentEntity->curstate.origin;
 	}
 
 	if ((flags & STUDIO_RENDER) != 0)
@@ -1528,10 +1634,21 @@ bool CStudioModelRenderer::StudioDrawPlayer(int flags, entity_state_t* pplayer)
 
 		IEngineStudio.StudioSetRemapColors(m_nTopColor, m_nBottomColor);
 
-		StudioRenderModel();
+		if (bPlayerBody)
+		{
+			glEnable(GL_DEPTH_CLAMP);
+			glDepthRange(0.0f, 0.4f);
+			StudioRenderModel();
+			glDepthRange(0.0f, 1.0f);
+			glDisable(GL_DEPTH_CLAMP);
+		}
+		else
+		{
+			StudioRenderModel();
+		}
 		m_pPlayerInfo = NULL;
 
-		if (0 != pplayer->weaponmodel)
+		if (0 != pplayer->weaponmodel && !bPlayerBody)
 		{
 			cl_entity_t saveent = *m_pCurrentEntity;
 
@@ -1731,3 +1848,171 @@ void CStudioModelRenderer::StudioRenderFinal()
 		StudioRenderFinal_Software();
 	}
 }
+
+// FULLBRIGHT START
+/*
+====================
+StudioGetFullbright
+returns true if model has a fullbright texture
+also caches the name if it isnt cached yet
+====================
+*/
+bool CStudioModelRenderer::StudioGetFullbright(model_s* pmodel)
+{
+	if (!pmodel || pmodel->type != mod_studio)
+		return false;
+
+	// check if this model is already been checked
+	for (size_t list = 0; list < m_szFullBrightModels.size(); list++)
+	{
+		if (!stricmp(pmodel->name, m_szFullBrightModels[list].c_str()))
+		{
+			return true;
+		}
+	}
+
+	// check if this model is already on our list
+	for (size_t list = 0; list < m_szCheckedModels.size(); list++)
+	{
+		if (!strcmp(pmodel->name, m_szCheckedModels[list].c_str()))
+		{
+			return false;
+		}
+	}
+
+	studiohdr_t* pHdr = (studiohdr_t*)IEngineStudio.Mod_Extradata(pmodel);
+	mstudiotexture_t* pTexture = (mstudiotexture_t*)((byte*)pmodel->cache.data + pHdr->textureindex);
+
+	if (strncmp((const char*)pHdr, "IDST", 4) && strncmp((const char*)pHdr, "IDSQ", 4))
+	{
+		//	delete[] pBuffer;
+		m_szCheckedModels.push_back(pmodel->name);
+		return false;
+	}
+
+	bool foundfullbright = false;
+	if (pHdr->textureindex)
+	{
+		for (int i = 0; i < pHdr->numtextures; i++)
+		{
+			// memcpy(&pTexture[i], &pTexture[pHdr->numtextures + 1], sizeof(mstudiotexture_t));
+			if (pTexture[i].flags & STUDIO_NF_FULLBRIGHT)
+			{
+				foundfullbright = true;
+			}
+		}
+		if (foundfullbright)
+		{
+			m_szFullBrightModels.push_back(pmodel->name);
+		}
+	}
+
+	m_szCheckedModels.push_back(pmodel->name);
+
+	return foundfullbright;
+}
+
+
+/*
+====================
+StudioRenderEntity
+if fullbright boolean is true, it renders only the fullbright texture
+if false, it renders all non-fullbright textures
+====================
+*/
+void CStudioModelRenderer::StudioRenderEntity(bool fullbright)
+{
+	studiohdr_t* pHdr = (studiohdr_t*)m_pStudioHeader;
+	mstudiotexture_t* pTexture = (mstudiotexture_t*)((byte*)m_pRenderModel->cache.data + pHdr->textureindex);
+
+	std::vector<mstudiotexture_t> savedtexture;
+
+	if (pHdr->textureindex > 0)
+	{
+		for (int i = 0; i < pHdr->numtextures; i++)
+		{
+			savedtexture.push_back(pTexture[i]);
+			// memcpy(&pTexture[i], &pTexture[pHdr->numtextures + 1], sizeof(mstudiotexture_t));
+			if ((pTexture[i].flags & STUDIO_NF_FULLBRIGHT) != 0)
+			{
+				if (!fullbright)
+				{
+					pTexture[i].index = g_iBlankTex;
+					pTexture[i].flags |= STUDIO_NF_ADDITIVE;
+				}
+			}
+			else if (fullbright)
+			{
+				pTexture[i].index = g_iBlankTex;
+				pTexture[i].flags |= STUDIO_NF_ADDITIVE;
+			}
+		}
+	}
+
+	alight_t lighting;
+	Vector dir;
+	lighting.plightvec = dir;
+
+	if (fullbright)
+	{
+		lighting.ambientlight = 128;
+		lighting.shadelight = 192;
+		lighting.color = {255, 255, 255};
+		// model and frame independant
+		IEngineStudio.StudioSetupLighting(&lighting);
+
+		StudioRenderModel();
+	}
+	else
+	{
+		IEngineStudio.StudioDynamicLight(m_pCurrentEntity, &lighting);
+		IEngineStudio.StudioEntityLight(&lighting);
+		// model and frame independant
+		IEngineStudio.StudioSetupLighting(&lighting);
+
+		StudioRenderModel();
+	}
+
+	for (int i = 0; i < pHdr->numtextures; i++)
+	{
+		memcpy(&pTexture[i], &savedtexture[i], sizeof(mstudiotexture_t));
+	}
+}
+
+void GenBlackTex()
+{
+	GLubyte pixels[3] = {0, 0, 0};
+
+	glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
+	glGenTextures(1, &g_iBlankTex);
+	glBindTexture(GL_TEXTURE_2D, g_iBlankTex);
+
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, 1, 1, 0, GL_RGB, GL_UNSIGNED_BYTE, pixels);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+}
+
+/*
+====================
+StudioCacheFullbrightNames
+====================
+*/
+void CStudioModelRenderer::StudioCacheFullbrightNames()
+{
+	const char* gamedir = gEngfuncs.pfnGetGameDirectory();
+
+	if (g_iBlankTex == 0)
+		GenBlackTex();
+
+	// clear the cache
+	m_szFullBrightModels.clear();
+	m_szCheckedModels.clear();
+
+	for (int i = 0; i < 512; i++)
+	{
+		StudioGetFullbright(IEngineStudio.GetModelByIndex(i));
+	}
+}
+
+// FULLBRIGHT END

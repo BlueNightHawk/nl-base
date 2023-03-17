@@ -96,6 +96,7 @@ void CGrenade::Explode(TraceResult* pTrace, int bitsDamageType)
 	origin.z -= 1;
 
 	RadiusDamage(origin, pev, pevOwner, pev->dmg, CLASS_NONE, bitsDamageType);
+	UTIL_ScreenShake(origin, pev->dmg * 0.1f, pev->dmg * 0.3f, pev->dmg * 0.01f, pev->dmg * 5.0f);
 
 	if (RANDOM_FLOAT(0, 1) < 0.5)
 	{

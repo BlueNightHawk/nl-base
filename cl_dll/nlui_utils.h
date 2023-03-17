@@ -30,6 +30,9 @@ typedef enum aspectratio_e
 	AR_UNKNOWN
 } aspectratio_e;
 
+// Algebraically simplified algorithm
+#define lerp(a, b, f) a + f*(b - a)
+
 namespace NLUtils
 {
 bool LoadTextureFromFile(const char* pszfilename, gltexture_s* pTexture);

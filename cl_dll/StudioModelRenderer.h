@@ -7,6 +7,10 @@
 
 #pragma once
 
+#include <string>
+#include <iostream>
+#include <vector>
+
 /*
 ====================
 CStudioModelRenderer
@@ -179,4 +183,16 @@ public:
 	// Concatenated bone and light transforms
 	float (*m_pbonetransform)[MAXSTUDIOBONES][3][4];
 	float (*m_plighttransform)[MAXSTUDIOBONES][3][4];
+
+	// FULLBRIGHT START
+
+	bool StudioGetFullbright(model_s* pmodel);
+
+	void StudioRenderEntity(bool fullbright = false);
+	void StudioCacheFullbrightNames();
+
+	std::vector<std::string> m_szCheckedModels;
+	std::vector<std::string> m_szFullBrightModels;
+
+	// FULLBRIGHT END
 };
