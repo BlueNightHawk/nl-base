@@ -41,6 +41,8 @@ CBaseEntity
 #define FCAP_ONOFF_USE 0x00000020		  // can be used by the player
 #define FCAP_DIRECTIONAL_USE 0x00000040	  // Player sends +/- 1 when using (currently only tracktrains)
 #define FCAP_MASTER 0x00000080			  // Can be used to "master" other entities (like multisource)
+#define FCAP_PHYSICS 0x00000100			  // Can be used to "master" other entities (like multisource)
+#define FCAP_PHYSICS_HOLDABLE 0x00000200			  // Can be used to "master" other entities (like multisource)
 
 // UNDONE: This will ignore transition volumes (trigger_transition), but not the PVS!!!
 #define FCAP_FORCE_TRANSITION 0x00000080 // ALWAYS goes across transitions
@@ -374,6 +376,14 @@ public:
 	int m_fInAttack;
 
 	int m_fireState;
+
+public:
+	void EXPORT PhysicsThink();
+
+	void EXPORT PhysicsTouch(CBaseEntity* pOther);
+	bool PhysicsTakeDamage(entvars_t* pevInflictor, entvars_t* pevAttacker, float flDamage, int bitsDamageType);
+
+	float m_flPhysTime = 0.0f;
 };
 
 inline bool FNullEnt(CBaseEntity* ent) { return (ent == NULL) || FNullEnt(ent->edict()); }

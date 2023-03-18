@@ -18,6 +18,9 @@
 class CItem : public CBaseEntity
 {
 public:
+	int ObjectCaps() override { return CBaseEntity::ObjectCaps() | FCAP_PHYSICS; }
+	bool TakeDamage(entvars_t* pevInflictor, entvars_t* pevAttacker, float flDamage, int bitsDamageType) override;
+
 	void Spawn() override;
 	CBaseEntity* Respawn() override;
 	void EXPORT ItemTouch(CBaseEntity* pOther);

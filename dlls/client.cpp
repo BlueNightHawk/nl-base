@@ -755,6 +755,21 @@ void PlayerPostThink(edict_t* pEntity)
 
 	if (pPlayer)
 		pPlayer->PostThink();
+
+	int i = 2;
+	while (1)
+	{
+		if (!g_engfuncs.pfnPEntityOfEntIndex(i))
+			break;
+
+		auto p = CBaseEntity::Instance(g_engfuncs.pfnPEntityOfEntIndex(i));
+
+		if ((p->ObjectCaps() & FCAP_PHYSICS) != 0)
+		{
+			p->PhysicsThink();
+		}
+		i++;
+	}
 }
 
 

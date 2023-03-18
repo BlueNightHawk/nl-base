@@ -151,13 +151,15 @@ enum
 class CGib : public CBaseEntity
 {
 public:
+	bool TakeDamage(entvars_t* pevInflictor, entvars_t* pevAttacker, float flDamage, int bitsDamageType) override;
+
 	void Spawn(const char* szGibModel);
 	void EXPORT BounceGibTouch(CBaseEntity* pOther);
 	void EXPORT StickyGibTouch(CBaseEntity* pOther);
 	void EXPORT WaitTillLand();
 	void LimitVelocity();
 
-	int ObjectCaps() override { return (CBaseEntity::ObjectCaps() & ~FCAP_ACROSS_TRANSITION) | FCAP_DONT_SAVE; }
+	int ObjectCaps() override { return (CBaseEntity::ObjectCaps() & ~FCAP_ACROSS_TRANSITION) | FCAP_DONT_SAVE | FCAP_PHYSICS; }
 	static void SpawnHeadGib(entvars_t* pevVictim);
 	static void SpawnRandomGibs(entvars_t* pevVictim, int cGibs, bool human);
 	static void SpawnStickyGibs(entvars_t* pevVictim, Vector vecOrigin, int cGibs);

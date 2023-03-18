@@ -23,6 +23,9 @@
 #include "game.h"
 #include "pm_shared.h"
 
+#include <algorithm>
+#include <cmath>
+
 void EntvarsKeyvalue(entvars_t* pev, KeyValueData* pkvd);
 
 void OnFreeEntPrivateData(edict_s* pEdict);
@@ -812,4 +815,87 @@ CBaseEntity* CBaseEntity::Create(const char* szName, const Vector& vecOrigin, co
 	pEntity->pev->angles = vecAngles;
 	DispatchSpawn(pEntity->edict());
 	return pEntity;
+}
+
+void V_SmoothInterpolateAngles(float* startAngle, float* endAngle, float* finalAngle, float degreesPerSec)
+{
+	float absd, frac, d, threshhold;
+
+	NormalizeAngles(startAngle);
+	NormalizeAngles(endAngle);
+
+	for (int i = 0; i < 3; i++)
+	{
+		d = endAngle[i] - startAngle[i];
+
+		if (d > 180.0f)
+		{
+			d -= 360.0f;
+		}
+		else if (d < -180.0f)
+		{
+			d += 360.0f;
+		}
+
+		absd = fabs(d);
+
+		if (absd > 0.01f)
+		{
+			frac = degreesPerSec * (gpGlobals->frametime * 5.0f);
+
+			threshhold = degreesPerSec / 4;
+
+			if (absd < threshhold)
+			{
+				float h = absd / threshhold;
+				h *= h;
+				frac *= h; // slow down last degrees
+			}
+
+			if (frac > absd)
+			{
+				finalAngle[i] = endAngle[i];
+			}
+			else
+			{
+				if (d > 0)
+					finalAngle[i] = startAngle[i] + frac;
+				else
+					finalAngle[i] = startAngle[i] - frac;
+			}
+		}
+		else
+		{
+			finalAngle[i] = endAngle[i];
+		}
+	}
+
+	NormalizeAngles(finalAngle);
+}
+
+void CBaseEntity::PhysicsThink()
+{
+	TraceResult tr;
+	UTIL_TraceLine(pev->origin, pev->origin - Vector(0, 0, 6), dont_ignore_monsters, ENT(pev), &tr);
+
+	if (tr.flFraction < 1.0)
+	{
+		//V_SmoothInterpolateAngles(pev->angles, (float *)&g_vecZero, pev->angles, 64.0f);
+
+		pev->angles.x = pev->angles.z = 0;
+		pev->avelocity.x = 0;
+	}
+}
+
+void CBaseEntity::PhysicsTouch(CBaseEntity* pOther)
+{
+	if ((pev->flags & FL_ONGROUND) != 0)
+		pev->velocity = pev->velocity * 0.9f;
+}
+
+bool CBaseEntity::PhysicsTakeDamage(entvars_t* pevInflictor, entvars_t* pevAttacker, float flDamage, int bitsDamageType)
+{
+	pev->velocity = (pevAttacker->origin - pev->origin) * (flDamage / 10.0f);
+	pev->avelocity = UTIL_VecToAngles(pev->velocity);
+	return true;
 }

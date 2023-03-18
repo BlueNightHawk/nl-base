@@ -662,7 +662,8 @@ void EV_FireMP5(event_args_t* args)
 		EV_MuzzleFlash();
 		gEngfuncs.pEventAPI->EV_WeaponAnimation(MP5_FIRE1 + gEngfuncs.pfnRandomLong(0, 2), 0);
 
-		V_PunchAxis(0, gEngfuncs.pfnRandomFloat(-2, 2));
+		V_PunchAxis(0, gEngfuncs.pfnRandomFloat(-1.25, 1.25));
+		V_PunchAxis(1, gEngfuncs.pfnRandomFloat(-0.5, 0.5));
 	}
 
 	EV_GetDefaultShellInfo(args, origin, velocity, ShellVelocity, ShellOrigin, forward, right, up, 20, -12, 4);
@@ -746,6 +747,7 @@ void EV_FirePython(event_args_t* args)
 		gEngfuncs.pEventAPI->EV_WeaponAnimation(PYTHON_FIRE1, multiplayer ? 1 : 0);
 
 		V_PunchAxis(0, -10.0);
+		V_PunchAxis(1, gEngfuncs.pfnRandomFloat(-4.0f, 4.0f));
 	}
 
 	switch (gEngfuncs.pfnRandomLong(0, 1))

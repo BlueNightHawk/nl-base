@@ -706,6 +706,8 @@ void CGib::WaitTillLand()
 //
 void CGib::BounceGibTouch(CBaseEntity* pOther)
 {
+	PhysicsTouch(pOther);
+
 	Vector vecSpot;
 	TraceResult tr;
 
@@ -749,6 +751,8 @@ void CGib::BounceGibTouch(CBaseEntity* pOther)
 //
 void CGib::StickyGibTouch(CBaseEntity* pOther)
 {
+	PhysicsTouch(pOther);
+
 	Vector vecSpot;
 	TraceResult tr;
 
@@ -778,6 +782,7 @@ void CGib::StickyGibTouch(CBaseEntity* pOther)
 void CGib::Spawn(const char* szGibModel)
 {
 	pev->movetype = MOVETYPE_BOUNCE;
+	pev->takedamage = DAMAGE_YES;
 	pev->friction = 0.55; // deading the bounce a bit
 
 	// sometimes an entity inherits the edict from a former piece of glass,
@@ -799,6 +804,12 @@ void CGib::Spawn(const char* szGibModel)
 	m_material = matNone;
 	m_cBloodDecals = 5; // how many blood decals this gib can place (1 per bounce until none remain).
 }
+
+bool CGib::TakeDamage(entvars_t* pevInflictor, entvars_t* pevAttacker, float flDamage, int bitsDamageType)
+{
+	return PhysicsTakeDamage(pevInflictor, pevAttacker, flDamage, bitsDamageType);
+}
+
 
 // take health
 bool CBaseMonster::TakeHealth(float flHealth, int bitsDamageType)

@@ -639,20 +639,31 @@ void V_RetractWeapon(struct ref_params_s *pparams)
 
 void V_JumpAngles(struct ref_params_s* pparams)
 {
+	cl_entity_s* view = gEngfuncs.GetViewModel();
+	auto pl = gEngfuncs.GetLocalPlayer();
+
 	extern kbutton_t in_jump;
 	static int iJumpStage = 0;
 
 	static float flFallDist = 0.0f;
 
-	cl_entity_s* view = gEngfuncs.GetViewModel();
-	auto pl = gEngfuncs.GetLocalPlayer();
+	Vector vecSrc = pparams->simorg;
+	Vector vecEnd = vecSrc - Vector(pparams->viewheight) - Vector(0,0,12);
 
+	pmtrace_t tr;
+	gEngfuncs.pEventAPI->EV_SetUpPlayerPrediction(0, 1);
+
+	gEngfuncs.pEventAPI->EV_PushPMStates();
+	gEngfuncs.pEventAPI->EV_SetTraceHull(2);
+	gEngfuncs.pEventAPI->EV_SetSolidPlayers(pparams->viewentity - 1);
+	gEngfuncs.pEventAPI->EV_PlayerTrace(vecSrc, vecEnd, PM_NORMAL, -1, &tr);
+	gEngfuncs.pEventAPI->EV_PopPMStates();
 
 	if (iJumpStage == 0)
 	{
 		flFallDist = lerp(flFallDist, 0, pparams->frametime * 17.0f);
 	}
-	if (pl->curstate.movetype != MOVETYPE_WALK || pparams->waterlevel != 0.0f || (iJumpStage == 0 && pparams->onground != 0))
+	if (pl->curstate.movetype != MOVETYPE_WALK || pparams->waterlevel != 0.0f || (iJumpStage == 0 && (tr.fraction < 1.0)))
 	{
 		iJumpStage = 0;
 	}
@@ -660,11 +671,11 @@ void V_JumpAngles(struct ref_params_s* pparams)
 	{
 		iJumpStage = 1;
 	}
-	else if (iJumpStage == 0 && pparams->onground == 0)
+	else if (iJumpStage == 0 && (pparams->onground == 0))
 	{
 		iJumpStage = 2;
 	}
-	else if (iJumpStage > 0 && pparams->onground != 0)
+	else if (iJumpStage > 0 && (pparams->onground != 0 || tr.fraction < 1.0))
 	{
 		v_jumppunch = Vector(-3, 3, 0) * 20.0f;
 		iJumpStage = 0;
