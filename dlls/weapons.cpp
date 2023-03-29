@@ -405,8 +405,11 @@ void CBasePlayerItem::SetObjectCollisionBox()
 //=========================================================
 void CBasePlayerItem::FallInit()
 {
-	pev->movetype = MOVETYPE_TOSS;
-	pev->solid = SOLID_BBOX;
+	pev->movetype = MOVETYPE_BOUNCE;
+	pev->solid = SOLID_TRIGGER;
+	pev->takedamage = DAMAGE_YES;
+
+	pev->friction = 0.8;
 
 	UTIL_SetOrigin(pev, pev->origin);
 	UTIL_SetSize(pev, Vector(0, 0, 0), Vector(0, 0, 0)); //pointsize until it lands on the ground.
@@ -532,6 +535,8 @@ CBaseEntity* CBasePlayerItem::Respawn()
 
 void CBasePlayerItem::DefaultTouch(CBaseEntity* pOther)
 {
+	PhysicsTouch(pOther);
+
 	// if it's not a player, ignore
 	if (!pOther->IsPlayer())
 		return;
@@ -865,7 +870,11 @@ void CBasePlayerWeapon::Holster()
 
 void CBasePlayerAmmo::Spawn()
 {
-	pev->movetype = MOVETYPE_TOSS;
+	pev->movetype = MOVETYPE_BOUNCE;
+	pev->takedamage = DAMAGE_YES;
+
+	pev->friction = 0.8;
+
 	pev->solid = SOLID_TRIGGER;
 	UTIL_SetSize(pev, Vector(-16, -16, 0), Vector(16, 16, 16));
 	UTIL_SetOrigin(pev, pev->origin);
@@ -901,6 +910,7 @@ void CBasePlayerAmmo::Materialize()
 
 void CBasePlayerAmmo::DefaultTouch(CBaseEntity* pOther)
 {
+	PhysicsTouch(pOther);
 	if (!pOther->IsPlayer())
 	{
 		return;

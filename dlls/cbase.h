@@ -381,7 +381,7 @@ public:
 	void EXPORT PhysicsThink();
 
 	void EXPORT PhysicsTouch(CBaseEntity* pOther);
-	bool PhysicsTakeDamage(entvars_t* pevInflictor, entvars_t* pevAttacker, float flDamage, int bitsDamageType);
+	void PhysicsTakeDamage(entvars_t* pevAttacker, float flDamage, Vector vecDir, TraceResult* ptr, int bitsDamageType);
 
 	float m_flPhysTime = 0.0f;
 };

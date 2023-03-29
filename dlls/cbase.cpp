@@ -25,6 +25,7 @@
 
 #include <algorithm>
 #include <cmath>
+#include "weapons.h"
 
 void EntvarsKeyvalue(entvars_t* pev, KeyValueData* pkvd);
 
@@ -875,27 +876,83 @@ void V_SmoothInterpolateAngles(float* startAngle, float* endAngle, float* finalA
 
 void CBaseEntity::PhysicsThink()
 {
+	if (m_flPhysTime > gpGlobals->time)
+		return;
+
+	// HACKHACK - On ground isn't always set, so look for ground underneath
 	TraceResult tr;
-	UTIL_TraceLine(pev->origin, pev->origin - Vector(0, 0, 6), dont_ignore_monsters, ENT(pev), &tr);
+	UTIL_TraceLine(pev->origin, pev->origin - Vector(0, 0, 10), ignore_monsters, edict(), &tr);
 
-	if (tr.flFraction < 1.0)
+	m_flPhysTime = gpGlobals->time + 0.12f;
+
+	if (pev->waterlevel == 3)
 	{
-		//V_SmoothInterpolateAngles(pev->angles, (float *)&g_vecZero, pev->angles, 64.0f);
-
-		pev->angles.x = pev->angles.z = 0;
-		pev->avelocity.x = 0;
+		pev->movetype = MOVETYPE_FLY;
+		pev->velocity = pev->velocity * 0.8;
+		pev->avelocity = pev->avelocity * 0.9;
+		pev->velocity.z += 2;
+	}
+	else if (pev->waterlevel == 0)
+	{
+		if (tr.flFraction < 1.0 || (pev->flags & FL_ONGROUND) != 0)
+		{
+			// add a bit of static friction
+			pev->velocity = pev->velocity * 0.55;
+			pev->avelocity = pev->avelocity * 0.5;
+		}
+		else
+		{
+			pev->avelocity = Vector(fabs(pev->velocity.z) * 0.45f, pev->velocity.x + pev->velocity.y, -fabs(pev->velocity.z) * 0.25f) * 1.454123f;
+		}
+		pev->movetype = MOVETYPE_BOUNCE;
+	}
+	else
+	{
+		pev->velocity.z -= 2;
 	}
 }
 
 void CBaseEntity::PhysicsTouch(CBaseEntity* pOther)
 {
-	if ((pev->flags & FL_ONGROUND) != 0)
-		pev->velocity = pev->velocity * 0.9f;
+	entvars_t* pevOther = pOther->pev;
+
+	// don't hit the guy that launched this grenade
+	if (pOther->edict() == pev->owner)
+		return;
+
+	// pev->avelocity = Vector (300, 300, 300);
+	pev->gravity = 1; // normal gravity now
+
+	// HACKHACK - On ground isn't always set, so look for ground underneath
+	TraceResult tr;
+	UTIL_TraceLine(pev->origin, pev->origin - Vector(0, 0, 10), ignore_monsters, edict(), &tr);
+
+	if (tr.flFraction < 1.0)
+	{
+		pev->angles.x = pev->angles.z = pev->avelocity.x = pev->avelocity.z = 0.0f;
+		// play sliding sound, volume based on velocity
+	}
+	if ((pev->flags & FL_ONGROUND) == 0 && pev->velocity.Length2D() > 10)
+	{
+	}
+
+	ClearMultiDamage();
+	pOther->TraceAttack(pev, pev->velocity.Length() / 100.0f, pOther->pev->origin - pev->origin, &tr, DMG_CLUB);
+	ApplyMultiDamage(pev, pev);
 }
 
-bool CBaseEntity::PhysicsTakeDamage(entvars_t* pevInflictor, entvars_t* pevAttacker, float flDamage, int bitsDamageType)
+void CBaseEntity::PhysicsTakeDamage(entvars_t* pevAttacker, float flDamage, Vector vecDir, TraceResult* ptr, int bitsDamageType)
 {
-	pev->velocity = (pevAttacker->origin - pev->origin) * (flDamage / 10.0f);
-	pev->avelocity = UTIL_VecToAngles(pev->velocity);
-	return true;
+	// HACKHACK - On ground isn't always set, so look for ground underneath
+	TraceResult tr;
+	UTIL_TraceLine(pev->origin, pev->origin - Vector(0, 0, 1), ignore_monsters, edict(), &tr);
+
+	if (tr.flFraction < 1.0)
+	{
+		pev->origin.z += 1;
+	}
+	pev->velocity = (vecDir) * (flDamage) * 25.0f;
+	pev->velocity.z = flDamage * 25.0f;
+
+//	ALERT(at_console, "Called : ENT = %s %f\n", STRING(pev->classname), pev->velocity.Length());
 }

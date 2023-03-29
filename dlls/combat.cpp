@@ -805,11 +805,6 @@ void CGib::Spawn(const char* szGibModel)
 	m_cBloodDecals = 5; // how many blood decals this gib can place (1 per bounce until none remain).
 }
 
-bool CGib::TakeDamage(entvars_t* pevInflictor, entvars_t* pevAttacker, float flDamage, int bitsDamageType)
-{
-	return PhysicsTakeDamage(pevInflictor, pevAttacker, flDamage, bitsDamageType);
-}
-
 
 // take health
 bool CBaseMonster::TakeHealth(float flHealth, int bitsDamageType)
@@ -1109,12 +1104,98 @@ void RadiusDamage(Vector vecSrc, entvars_t* pevInflictor, entvars_t* pevAttacker
 				}
 				else
 				{
+					if ((pEntity->ObjectCaps() & FCAP_PHYSICS) != 0)
+					{
+						pEntity->TraceAttack(pevInflictor, flAdjustedDamage, (tr.vecEndPos - vecSrc).Normalize(), &tr, bitsDamageType);
+					}
 					pEntity->TakeDamage(pevInflictor, pevAttacker, flAdjustedDamage, bitsDamageType);
 				}
 			}
 		}
 	}
 }
+
+//
+// RadiusDamage - this entity is exploding, or otherwise needs to inflict damage upon entities within a certain range.
+//
+// only damage ents that can clearly be seen by the explosion!
+
+
+void PhysDamage(Vector vecSrc, Vector vecDir, entvars_t* pevInflictor, entvars_t* pevAttacker, float flDamage, float flRadius, int bitsDamageType)
+{
+	CBaseEntity* pEntity = NULL;
+	TraceResult tr;
+	float flAdjustedDamage, falloff;
+	Vector vecSpot;
+
+	if (0 != flRadius)
+		falloff = flDamage / flRadius;
+	else
+		falloff = 1.0;
+
+	const bool bInWater = (UTIL_PointContents(vecSrc) == CONTENTS_WATER);
+
+	vecSrc.z += 1; // in case grenade is lying on the ground
+
+	if (!pevAttacker)
+		pevAttacker = pevInflictor;
+
+	// iterate on all entities in the vicinity.
+	while ((pEntity = UTIL_FindEntityInSphere(pEntity, vecSrc, flRadius)) != NULL)
+	{
+		if (pEntity->pev->takedamage != DAMAGE_NO)
+		{
+			if ((pEntity->ObjectCaps() & FCAP_PHYSICS) == 0)
+			{ 
+				continue;
+			}
+
+			// blast's don't tavel into or out of water
+			if (bInWater && pEntity->pev->waterlevel == 0)
+				continue;
+			if (!bInWater && pEntity->pev->waterlevel == 3)
+				continue;
+
+			vecSpot = pEntity->BodyTarget(vecSrc);
+
+			UTIL_TraceLine(vecSrc, vecSpot, dont_ignore_monsters, ENT(pevInflictor), &tr);
+
+			if (tr.flFraction == 1.0 || tr.pHit == pEntity->edict())
+			{ // the explosion can 'see' this entity, so hurt them!
+				if (0 != tr.fStartSolid)
+				{
+					// if we're stuck inside them, fixup the position and distance
+					tr.vecEndPos = vecSrc;
+					tr.flFraction = 0.0;
+				}
+
+				// decrease damage for an ent that's farther from the bomb.
+				flAdjustedDamage = (vecSrc - tr.vecEndPos).Length() * falloff;
+				flAdjustedDamage = flDamage - flAdjustedDamage;
+
+				if (flAdjustedDamage < 0)
+				{
+					flAdjustedDamage = 0;
+				}
+
+				// ALERT( at_console, "hit %s\n", STRING( pEntity->pev->classname ) );
+				if (tr.flFraction != 1.0)
+				{
+					ALERT(at_console, "TRACE \n");
+					ClearMultiDamage();
+					pEntity->TraceAttack(pevInflictor, flAdjustedDamage, vecDir, &tr, bitsDamageType);
+					ApplyMultiDamage(pevInflictor, pevAttacker);
+				}
+				else
+				{
+					ALERT(at_console, "NO TRACE \n");
+					pEntity->TraceAttack(pevInflictor, flAdjustedDamage, vecDir, &tr, bitsDamageType);
+				}
+			}
+		}
+	}
+}
+
 
 
 void CBaseMonster::RadiusDamage(entvars_t* pevInflictor, entvars_t* pevAttacker, float flDamage, int iClassIgnore, int bitsDamageType)
@@ -1547,8 +1628,12 @@ Vector CBaseEntity::FireBulletsPlayer(unsigned int cShots, Vector vecSrc, Vector
 		{
 			CBaseEntity* pEntity = CBaseEntity::Instance(tr.pHit);
 
+			float flDmg = 0.0f;
+
 			if (0 != iDamage)
 			{
+				flDmg = iDamage;
+
 				pEntity->TraceAttack(pevAttacker, iDamage, vecDir, &tr, DMG_BULLET | ((iDamage > 16) ? DMG_ALWAYSGIB : DMG_NEVERGIB));
 
 				TEXTURETYPE_PlaySound(&tr, vecSrc, vecEnd, iBulletType);
@@ -1559,23 +1644,28 @@ Vector CBaseEntity::FireBulletsPlayer(unsigned int cShots, Vector vecSrc, Vector
 				{
 				default:
 				case BULLET_PLAYER_9MM:
+					flDmg = gSkillData.plrDmg9MM;
 					pEntity->TraceAttack(pevAttacker, gSkillData.plrDmg9MM, vecDir, &tr, DMG_BULLET);
 					break;
 
 				case BULLET_PLAYER_MP5:
+					flDmg = gSkillData.plrDmgMP5;
 					pEntity->TraceAttack(pevAttacker, gSkillData.plrDmgMP5, vecDir, &tr, DMG_BULLET);
 					break;
 
 				case BULLET_PLAYER_BUCKSHOT:
 					// make distance based!
+					flDmg = gSkillData.plrDmgBuckshot;
 					pEntity->TraceAttack(pevAttacker, gSkillData.plrDmgBuckshot, vecDir, &tr, DMG_BULLET);
 					break;
 
 				case BULLET_PLAYER_357:
+					flDmg = gSkillData.plrDmg357;
 					pEntity->TraceAttack(pevAttacker, gSkillData.plrDmg357, vecDir, &tr, DMG_BULLET);
 					break;
 
 				case BULLET_NONE: // FIX
+					flDmg = 50;
 					pEntity->TraceAttack(pevAttacker, 50, vecDir, &tr, DMG_CLUB);
 					TEXTURETYPE_PlaySound(&tr, vecSrc, vecEnd, iBulletType);
 					// only decal glass
@@ -1586,7 +1676,10 @@ Vector CBaseEntity::FireBulletsPlayer(unsigned int cShots, Vector vecSrc, Vector
 
 					break;
 				}
+
+			PhysDamage(tr.vecEndPos, vecDir, pev, pev, flDmg * 4.35f, 5.0f, DMG_CLUB);
 		}
+
 		// make bullet trails
 		UTIL_BubbleTrail(vecSrc, tr.vecEndPos, (flDistance * tr.flFraction) / 64.0);
 	}

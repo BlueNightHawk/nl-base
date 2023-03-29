@@ -23,6 +23,15 @@
 
 class CSatchelCharge : public CGrenade
 {
+	int ObjectCaps() override { return CGrenade::ObjectCaps() | FCAP_PHYSICS; }
+
+	void TraceAttack(entvars_t* pevAttacker, float flDamage, Vector vecDir, TraceResult* ptr, int bitsDamageType) override
+	{
+		PhysicsTakeDamage(pevAttacker, flDamage, vecDir, ptr, bitsDamageType);
+	}
+
+	bool TakeDamage(entvars_t* pevInflictor, entvars_t* pevAttacker, float flDamage, int bitsDamageType) override { return false; }
+
 	void Spawn() override;
 	void Precache() override;
 	void BounceSound() override;
@@ -52,6 +61,7 @@ void CSatchelCharge::Spawn()
 	// motor
 	pev->movetype = MOVETYPE_BOUNCE;
 	pev->solid = SOLID_BBOX;
+	pev->takedamage = DAMAGE_YES;
 
 	SET_MODEL(ENT(pev), "models/w_satchel.mdl");
 	//UTIL_SetSize(pev, Vector( -16, -16, -4), Vector(16, 16, 32));	// Old box -- size of headcrab monsters/players get blocked by this
@@ -80,20 +90,8 @@ void CSatchelCharge::SatchelSlide(CBaseEntity* pOther)
 	if (pOther->edict() == pev->owner)
 		return;
 
-	// pev->avelocity = Vector (300, 300, 300);
-	pev->gravity = 1; // normal gravity now
+	PhysicsTouch(pOther);
 
-	// HACKHACK - On ground isn't always set, so look for ground underneath
-	TraceResult tr;
-	UTIL_TraceLine(pev->origin, pev->origin - Vector(0, 0, 10), ignore_monsters, edict(), &tr);
-
-	if (tr.flFraction < 1.0)
-	{
-		// add a bit of static friction
-		pev->velocity = pev->velocity * 0.95;
-		pev->avelocity = pev->avelocity * 0.9;
-		// play sliding sound, volume based on velocity
-	}
 	if ((pev->flags & FL_ONGROUND) == 0 && pev->velocity.Length2D() > 10)
 	{
 		BounceSound();
@@ -111,22 +109,6 @@ void CSatchelCharge::SatchelThink()
 	{
 		UTIL_Remove(this);
 		return;
-	}
-
-	if (pev->waterlevel == 3)
-	{
-		pev->movetype = MOVETYPE_FLY;
-		pev->velocity = pev->velocity * 0.8;
-		pev->avelocity = pev->avelocity * 0.9;
-		pev->velocity.z += 8;
-	}
-	else if (pev->waterlevel == 0)
-	{
-		pev->movetype = MOVETYPE_BOUNCE;
-	}
-	else
-	{
-		pev->velocity.z -= 8;
 	}
 }
 

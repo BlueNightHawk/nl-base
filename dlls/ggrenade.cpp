@@ -351,7 +351,7 @@ void CGrenade::TumbleThink()
 	if (pev->waterlevel != 0)
 	{
 		pev->velocity = pev->velocity * 0.5;
-		pev->framerate = 0.2;
+		pev->framerate = 0;
 	}
 }
 
@@ -406,6 +406,7 @@ CGrenade* CGrenade::ShootTimed(entvars_t* pevOwner, Vector vecStart, Vector vecV
 	pGrenade->pev->velocity = vecVelocity;
 	pGrenade->pev->angles = UTIL_VecToAngles(pGrenade->pev->velocity);
 	pGrenade->pev->owner = ENT(pevOwner);
+	pGrenade->pev->takedamage = DAMAGE_YES;
 
 	pGrenade->SetTouch(&CGrenade::BounceTouch); // Bounce if touched
 

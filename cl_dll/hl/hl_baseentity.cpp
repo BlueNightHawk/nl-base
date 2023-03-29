@@ -336,3 +336,15 @@ void CBasePlayerWeapon::RetireWeapon() {}
 void CBasePlayerWeapon::DoRetireWeapon() {}
 void CSoundEnt::InsertSound(int iType, const Vector& vecOrigin, int iVolume, float flDuration) {}
 void RadiusDamage(Vector vecSrc, entvars_t* pevInflictor, entvars_t* pevAttacker, float flDamage, float flRadius, int iClassIgnore, int bitsDamageType) {}
+
+void CBaseEntity::PhysicsThink()
+{
+}
+
+void CBaseEntity::PhysicsTouch(CBaseEntity* pOther)
+{
+}
+
+void CBaseEntity::PhysicsTakeDamage(entvars_t* pevAttacker, float flDamage, Vector vecDir, TraceResult* ptr, int bitsDamageType)
+{
+}

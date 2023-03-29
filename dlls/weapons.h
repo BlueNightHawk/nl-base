@@ -57,6 +57,15 @@ public:
 	int BloodColor() override { return DONT_BLEED; }
 	void Killed(entvars_t* pevAttacker, int iGib) override;
 
+	int ObjectCaps() override { return CBaseMonster::ObjectCaps() | FCAP_PHYSICS; }
+
+	void TraceAttack(entvars_t* pevAttacker, float flDamage, Vector vecDir, TraceResult* ptr, int bitsDamageType) override
+	{
+		PhysicsTakeDamage(pevAttacker, flDamage, vecDir, ptr, bitsDamageType);
+	}
+
+	bool TakeDamage(entvars_t* pevInflictor, entvars_t* pevAttacker, float flDamage, int bitsDamageType) override { return false; }
+
 	bool m_fRegisteredSound; // whether or not this grenade has issued its DANGER sound to the world sound list yet.
 };
 
@@ -283,6 +292,20 @@ public:
 
 	//Hack so deploy animations work when weapon prediction is enabled.
 	bool m_ForceSendAnimations = false;
+
+	int ObjectCaps() override {
+		int caps = CBaseAnimating::ObjectCaps();
+		if (!m_pPlayer)
+			caps |= FCAP_PHYSICS;
+		return caps; 
+	}
+
+	void TraceAttack(entvars_t* pevAttacker, float flDamage, Vector vecDir, TraceResult* ptr, int bitsDamageType) override
+	{
+		PhysicsTakeDamage(pevAttacker, flDamage, vecDir, ptr, bitsDamageType);
+	}
+
+	bool TakeDamage(entvars_t* pevInflictor, entvars_t* pevAttacker, float flDamage, int bitsDamageType) override { return false; }
 };
 
 
@@ -378,6 +401,15 @@ public:
 
 	CBaseEntity* Respawn() override;
 	void EXPORT Materialize();
+
+	int ObjectCaps() override { return CBaseEntity::ObjectCaps() | FCAP_PHYSICS; }
+
+	void TraceAttack(entvars_t* pevAttacker, float flDamage, Vector vecDir, TraceResult* ptr, int bitsDamageType) override
+	{
+		PhysicsTakeDamage(pevAttacker, flDamage, vecDir, ptr, bitsDamageType);
+	}
+
+	bool TakeDamage(entvars_t* pevInflictor, entvars_t* pevAttacker, float flDamage, int bitsDamageType) override { return false; }
 };
 
 
@@ -830,6 +862,9 @@ public:
 	void EXPORT IgniteThink();
 	void EXPORT RocketTouch(CBaseEntity* pOther);
 	static CRpgRocket* CreateRpgRocket(Vector vecOrigin, Vector vecAngles, CBaseEntity* pOwner, CRpg* pLauncher);
+
+	int ObjectCaps() override { return CBaseMonster::ObjectCaps(); }
+
 
 	int m_iTrail;
 	float m_flIgniteTime;

@@ -19,7 +19,12 @@ class CItem : public CBaseEntity
 {
 public:
 	int ObjectCaps() override { return CBaseEntity::ObjectCaps() | FCAP_PHYSICS; }
-	bool TakeDamage(entvars_t* pevInflictor, entvars_t* pevAttacker, float flDamage, int bitsDamageType) override;
+	void TraceAttack(entvars_t* pevAttacker, float flDamage, Vector vecDir, TraceResult* ptr, int bitsDamageType) override
+	{
+		PhysicsTakeDamage(pevAttacker, flDamage, vecDir, ptr, bitsDamageType);
+	}
+
+	bool TakeDamage(entvars_t* pevInflictor, entvars_t* pevAttacker, float flDamage, int bitsDamageType) override { return true; }
 
 	void Spawn() override;
 	CBaseEntity* Respawn() override;

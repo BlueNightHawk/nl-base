@@ -30,11 +30,6 @@
 #include "gamerules.h"
 #include "UserMessages.h"
 
-bool CItem::TakeDamage(entvars_t* pevInflictor, entvars_t* pevAttacker, float flDamage, int bitsDamageType)
-{
-	return PhysicsTakeDamage(pevInflictor, pevAttacker, flDamage, bitsDamageType);
-}
-
 class CWorldItem : public CBaseEntity
 {
 public:
@@ -94,7 +89,7 @@ void CWorldItem::Spawn()
 void CItem::Spawn()
 {
 	pev->movetype = MOVETYPE_BOUNCE;
-	pev->friction = 0.35f;
+	pev->friction = 0.8;
 	pev->takedamage = DAMAGE_YES;
 	pev->solid = SOLID_TRIGGER;
 	UTIL_SetOrigin(pev, pev->origin);

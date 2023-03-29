@@ -37,6 +37,14 @@ class CTripmineGrenade : public CGrenade
 
 	bool TakeDamage(entvars_t* pevInflictor, entvars_t* pevAttacker, float flDamage, int bitsDamageType) override;
 
+	void TraceAttack(entvars_t* pevAttacker, float flDamage, Vector vecDir, TraceResult* ptr, int bitsDamageType) override
+	{
+		CBaseMonster::TraceAttack(pevAttacker, flDamage, vecDir, ptr, bitsDamageType);
+	}
+
+	int ObjectCaps() override { return CBaseMonster::ObjectCaps(); }
+
+
 	void EXPORT WarningThink();
 	void EXPORT PowerupThink();
 	void EXPORT BeamBreakThink();
