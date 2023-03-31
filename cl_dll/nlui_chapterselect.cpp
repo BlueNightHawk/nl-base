@@ -79,7 +79,7 @@ void CChapterSelect::Update()
 			if (i >= m_ChapterInfo.size())
 			{
 				m_ChapterInfo.at(0).texture.Scale();
-
+				m_ChapterInfo.at(0).texture.MinClamp(0.5);
 				ImGui::Text("");
 				ImGui::Text("");
 
@@ -99,6 +99,7 @@ void CChapterSelect::Update()
 			}
 
 			m_ChapterInfo.at(i).texture.Scale();
+			m_ChapterInfo.at(i).texture.MinClamp(0.5);
 
 			ImGui::TextColored(ImGui::GetStyleColorVec4(ImGuiCol_HeaderActive), "%s %i", GetStringByIndex(ChapterSelectString_Chapter), i + 1);
 			ImGui::Text("%s", m_ChapterInfo.at(i).name.c_str());
@@ -244,12 +245,10 @@ void CChapterSelect::InitThumbnails()
 			break;
 
 		sprintf(filepath, "%s%i.png", path, i);
-		if (!NLUtils::LoadTextureFromFile(filepath, &m_ChapterInfo.at(i).texture))
+		if (!m_ChapterInfo.at(i).texture.LoadTexture(filepath))
 		{
 			break;
 		}
-
-		m_ChapterInfo.at(i).texture.Scale();
 
 		remainder = ((i + 1) % 3);
 		if (remainder == 0)

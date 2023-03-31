@@ -516,6 +516,9 @@
     <ClCompile Include="..\..\cl_dll\reGS_hudspr.cpp">
       <Filter>Source Files\nl\reGS</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\cl_dll\nlui_background.cpp">
+      <Filter>Source Files\nl\nlui_vanilla</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\cl_dll\kbutton.h">
@@ -822,6 +825,9 @@
       <Filter>Header Files\nl\nlui</Filter>
     </ClInclude>
     <ClInclude Include="..\..\cl_dll\nlui_utils.h">
+      <Filter>Header Files\nl\nlui</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\cl_dll\nlui_background.h">
       <Filter>Header Files\nl\nlui</Filter>
     </ClInclude>
   </ItemGroup>

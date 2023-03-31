@@ -34,10 +34,17 @@ void CImGuiManager::Update()
 	float scale = NLUtils::ScaleFont();
 
 	ImGuiIO& io = ImGui::GetIO();
-	io.FontGlobalScale = std::clamp(scale - 0.5f, 0.7f, 1.8f);
+	io.FontGlobalScale = std::clamp(scale * 0.7f, 0.7f, 1.8f);
 
 	ImGui::GetStyle() = m_SavedStyle;
 	ImGui::GetStyle().ScaleAllSizes(std::clamp(scale, 1.0f, 2.5f));
+
+	m_flTime = gEngfuncs.GetAbsoluteTime();
+	if (m_flTime != m_flOldTime)
+	{
+		m_flTimeDelta = fabs(m_flTime - m_flOldTime);
+		m_flOldTime = m_flTime;
+	}
 }
 
 void CImGuiManager::AddWindow(CImGuiWindow* pWindow)

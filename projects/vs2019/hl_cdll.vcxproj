@@ -153,6 +153,7 @@ cmd /c ""$(ProjectDir)..\..\filecopy.bat" "$(OutDir)" "cl_dlls" "$(TargetName).p
     <ClCompile Include="..\..\cl_dll\menu.cpp" />
     <ClCompile Include="..\..\cl_dll\message.cpp" />
     <ClCompile Include="..\..\cl_dll\nlfuncs.cpp" />
+    <ClCompile Include="..\..\cl_dll\nlui_background.cpp" />
     <ClCompile Include="..\..\cl_dll\nlui_chapterselect.cpp" />
     <ClCompile Include="..\..\cl_dll\nlui_main.cpp" />
     <ClCompile Include="..\..\cl_dll\nlui_utils.cpp" />
@@ -273,6 +274,7 @@ cmd /c ""$(ProjectDir)..\..\filecopy.bat" "$(OutDir)" "cl_dlls" "$(TargetName).p
     <ClInclude Include="..\..\cl_dll\in_defs.h" />
     <ClInclude Include="..\..\cl_dll\kbutton.h" />
     <ClInclude Include="..\..\cl_dll\nlfuncs.h" />
+    <ClInclude Include="..\..\cl_dll\nlui_background.h" />
     <ClInclude Include="..\..\cl_dll\nlui_chapterselect.h" />
     <ClInclude Include="..\..\cl_dll\nlui_main.h" />
     <ClInclude Include="..\..\cl_dll\nlui_utils.h" />

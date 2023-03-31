@@ -32,6 +32,10 @@ public:
 
 	string GetStringLocale(string str);
 
+	float m_flTime = 0.0f;
+	float m_flOldTime = 0.0f;
+	float m_flTimeDelta = 0.0f;
+
 private:
 	std::vector<CImGuiWindow*> m_pImguiWindows;
 

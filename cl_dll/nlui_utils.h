@@ -18,7 +18,13 @@ typedef struct gltexture_s
 	int width = 0;
 	int height = 0;
 
-	void Scale();
+	void Scale(float flScale = 1.0f);
+	void MinClamp(float flScale = 1.0f)
+	{
+		width = V_max(width, original_width * flScale);	
+		height = V_max(height, original_height * flScale);	
+	}
+	bool LoadTexture(const char *p);
 } gltexture_t;
 
 typedef enum aspectratio_e

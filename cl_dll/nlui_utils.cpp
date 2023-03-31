@@ -81,24 +81,26 @@ aspectratio_e NLUtils::GetScreenAspectRatio()
 
 	return AR_UNKNOWN;
 }
-
 void NLUtils::Scaling(int* w, int* h)
 {
 	if (!g_DisplayInfo.window || (!w && !h))
 		return;
 
-		// scale for screen sizes
-	float xscale = g_DisplayInfo.ScreenWidth / (float)640.0f;
-	float yscale = g_DisplayInfo.ScreenHeight / (float)480.0f;
+	int sw = 0.0f, sh = 0.0f;
+
+	NLUtils::GetScreenSize(&sw, &sh);
+
+	float xscale, yscale;
+
+	float yfactor = (float)sw / (float)sh;
+
+	xscale = ((float)sw / 2408.0f);
+	yscale = ((float)sh / 2408.0f) * yfactor;
 
 	if (w)
-	{
 		*w *= xscale;
-	}
 	if (h)
-	{
-		*h *= xscale;
-	}
+		*h *= yscale;
 }
 
 void NLUtils::Scaling(float* w, float* h)
@@ -108,51 +110,20 @@ void NLUtils::Scaling(float* w, float* h)
 
 	aspectratio_e aspectratio = GetScreenAspectRatio();
 
+	int sw = 0.0f, sh = 0.0f;
+
+	NLUtils::GetScreenSize(&sw, &sh);
+
+	float xscale, yscale;
+
+	float yfactor = (float)sw / (float)sh;
+	xscale = ((float)sw / 2408.0f);
+	yscale = ((float)sh / 2408.0f) * yfactor;
+
 	if (w)
-	{
-		float factor = (float)g_DisplayInfo.ScreenWidth;
-		switch (aspectratio)
-		{
-		case AR_16_9:
-			factor /= 880.0f;
-			break;
-		case AR_16_10:
-			factor /= 768.0f;
-			break;
-		case AR_1_1:
-			factor /= 480.0f;
-			break;
-		default:
-		case AR_4_3:
-			factor /= 450.0f;
-			break;
-		}
-
-		*w *= factor;
-	}
+		*w *= xscale;
 	if (h)
-	{
-		float factor = (float)g_DisplayInfo.ScreenHeight;
-
-		switch (aspectratio)
-		{
-		case AR_16_9:
-			factor /= 852.0f;
-			break;
-		case AR_16_10:
-			factor /= 768.0f;
-			break;
-		case AR_1_1:
-			factor /= 480.0f;
-			break;
-		default:
-		case AR_4_3:
-			factor /= 450.0f;
-			break;
-		}
-
-		*h *= factor;
-	}
+		*h *= yscale;
 }
 
 void NLUtils::GetScreenSize(int* w, int* h)
@@ -165,45 +136,41 @@ float NLUtils::ScaleFont()
 	int w = 0.0f, h = 0.0f;
 
 	NLUtils::GetScreenSize(&w, &h);
-	float scale = (w + h);
 
-	if (NLUtils::GetScreenAspectRatio() == AR_16_9)
-	{
-		scale /= 2160.0f;
-	}
-	if (NLUtils::GetScreenAspectRatio() == AR_4_3)
-	{
-		if (w == 640 && h == 480)
-		{
-			scale = 0;
-		}
-		else
-			scale /= 2048.0f;
-	}
+	float xscale, yscale;
 
-	scale = std::clamp(scale, 0.52f, 20.0f);
+	float yfactor = (float)w / (float)h;
 
-	return scale;
+	xscale = ((float)w / 2408.0f);
+	yscale = ((float)h / 2408.0f) * yfactor;
+
+	return ((xscale)) * 1.55f;
 }
 
-void gltexture_t::Scale()
+void gltexture_t::Scale(float flScale)
 {
 	int w = 0.0f, h = 0.0f;
 
 	NLUtils::GetScreenSize(&w, &h);
-	float scale = (w + h);
 
-	if (NLUtils::GetScreenAspectRatio() == AR_16_9)
-	{
-		scale /= 3840.0f;
-	}
-	if (NLUtils::GetScreenAspectRatio() == AR_4_3)
-	{
-		scale /= 2480.0f;
-	}
+	float xscale, yscale;
 
-	width = original_width * std::clamp(scale, 0.52f, 20.0f);
-	height = original_height * std::clamp(scale, 0.52f, 20.0f);
+	float yfactor = (float)w / (float)h;
+
+	xscale = ((float)w / 2408.0f);
+	yscale = ((float)h / 2408.0f) * yfactor;
+
+	width = original_width * xscale;
+	height = original_height * yscale;
+
+	width *= flScale;
+	height *= flScale;
+}
+
+
+bool gltexture_t::LoadTexture(const char* p)
+{
+	return NLUtils::LoadTextureFromFile(p, this);
 }
 
 std::map<string, viewmodelinfo_s> g_ViewModelInfoMap;
